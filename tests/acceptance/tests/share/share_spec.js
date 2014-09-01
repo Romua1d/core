@@ -15,7 +15,6 @@ describe('Share', function() {
   var userPage;
   var filesPage;
   var adminPage;
-  var page;
   var shareApi;
 
   beforeEach(function() {
@@ -24,7 +23,6 @@ describe('Share', function() {
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
-    page = new Page();
     shareApi = new ShareApi(params.baseUrl);
   });
 
@@ -235,7 +233,7 @@ describe('Share', function() {
     expect(element(filesPage.saveButtonId).toBeDisplayed).toBeFalsy();
   });
 
-  it('should chage file, when user (not the owner) with privileges edits it', function() {
+  it('should change file, when user (not the owner) with privileges edits it', function() {
     loginPage.logout
     filesPage.getAsUser(params.login.user, params.login.password);
 
@@ -260,7 +258,7 @@ describe('Share', function() {
     filesPage.deleteFile('userEdits.txt');
   });
 
-  it('should chage file in all users, when owner edits it', function() {
+  it('should change file for all users, when owner edits shared file', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
 
     var createFile = function() {
@@ -281,7 +279,19 @@ describe('Share', function() {
     expect(filesPage.getTextContent()).toEqual('Owner made edits!')
   });
 
-  it('should show the shared icon on all files and Folders within a shared directory', function() {
+  it('should not be possible to share via link, if admin disabled this option', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    adminPage.get();
+    adminPage.disableLinks();
+    filesPage.get();
+    filesPage.openShareForm('ownerEdits.txt');
+    expect(filesPage.shareLinkCheckBox.toBeDisplayed()).toBeFalsy();
+
+    adminPage.get();
+    adminPage.disableLinks();
+  });
+
+  it('should show the shared icon on all files and folders within a shared directory', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     var createFiles = function() {
       filesPage.createNewFolder('sharedFolder');
@@ -322,7 +332,7 @@ describe('Share', function() {
     expect(renamedSharedFolder.isDisplayed()).toBeTruthy();
   });
 
-  it('should share a file, if it is mouved in a shared folder', function() {
+  it('should share a file, if it is moved in a shared folder', function() {
     filesPage.getAsUser(params.login.user, params.login.password); 
     var createFolder = function() {
     filesPage.createNewFolder('moveItIn');
@@ -482,5 +492,4 @@ describe('Admin configs Share', function() {
     adminPage.get();
     adminPage.activateOption(adminPage.shareAPIEnabledCheckBox);
   });
-
 });

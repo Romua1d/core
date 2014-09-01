@@ -3,7 +3,7 @@ var UserPage = require('../pages/user.page.js');
 var FirstRunWizardPage = require('../pages/firstRunWizard.page.js');
 var Screenshot = require('../helper/screenshot.js');
 
-ddescribe('Authentication', function() {
+describe('Authentication', function() {
   var params = browser.params;
   var loginPage;
   

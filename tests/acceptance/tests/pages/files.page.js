@@ -53,7 +53,6 @@
     this.filterAllFiles = element(by.css('.nav-files'));
     this.filterSharedWhithYou = element(by.css('.nav-sharingin'));
     this.filterSharedWhithOthers = element(by.css('.nav-sharingout'));
-
   };
 
 //================ LOCATOR FUNCTIONS ===================================================//
@@ -260,7 +259,6 @@
     //  browser.wait(function(){
     //   return dropdown.isDisplayed();
     // }, 3000);s
-
     // TODO: Timing Workaround
     browser.sleep(800);
     disableEditButton.click();
