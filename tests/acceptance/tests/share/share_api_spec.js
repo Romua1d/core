@@ -35,7 +35,7 @@ describe('Share Api', function() {
 
   it('should create a new share', function() {
     var create = function () {
-      return shareApi.create('asdf.txt', 'demo2', 0);
+      return shareApi.create('music', 'demo2', 0);
     };
 
     flow.execute(create).then(function(res){

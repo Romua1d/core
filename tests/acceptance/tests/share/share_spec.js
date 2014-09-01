@@ -39,6 +39,7 @@ describe('Share', function() {
 
 
   it('should share a folder with another user by username', function() {
+    filesPage.get();
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.createNewFolder('toShare_1');
     browser.sleep(500);
@@ -47,6 +48,7 @@ describe('Share', function() {
     loginPage.logout();
     loginPage.login('demo', 'password');
     expect(filesPage.listFiles()).toContain('toShare_1');
+    loginPage.logout();
   });
 
   it('should share a folder including special characters', function() {
@@ -58,6 +60,7 @@ describe('Share', function() {
     loginPage.logout();
     loginPage.login('demo', 'password');
     expect(filesPage.listFiles()).toContain('sP€c!@L');
+    loginPage.logout();
   });
 
   it('should share a folder with 3 another user by display name', function() {
@@ -81,7 +84,7 @@ describe('Share', function() {
     filesPage.shareWithForm.sendKeys(protractor.Key.ENTER);
 
     loginPage.logout();
-    loginPage.login('demo2', 'password');
+    loginPage.login('demo4', 'password');
     expect(filesPage.listFiles()).toContain('toShare_2');
 
     loginPage.logout();
@@ -89,7 +92,7 @@ describe('Share', function() {
     expect(filesPage.listFiles()).toContain('toShare_2');
 
     loginPage.logout();
-    loginPage.login('demo4', 'password');
+    loginPage.login('demo2', 'password');
     expect(filesPage.listFiles()).toContain('toShare_2');
   });
 
@@ -116,6 +119,7 @@ describe('Share', function() {
     filesPage.renameFile('inSharedBySecond.txt', 'renamedBySecond.txt')
     expect(filesPage.listFiles()).toContain('renamedBySecond');
     filesPage.deleteFile('renamedBySecond.txt');
+    loginPage.logout()
   });
 
   it('should delete the root folder shared with a user account by another user', function() {
@@ -165,6 +169,7 @@ describe('Share', function() {
   });
 
   it('should delete a file shared with a user, form all if owner deletes it', function() {
+    filesPage.get();
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.createNewTxtFile('toDeleteByOwner');
     filesPage.shareFile('toDeleteByOwner.txt', 'demo');
@@ -180,6 +185,7 @@ describe('Share', function() {
     loginPage.logout();
     loginPage.login('demo', 'password');
     expect(filesPage.listFiles()).not.toContain('toDeleteByOwner');
+    loginPage.logout();
 
   });
 
