@@ -1,6 +1,11 @@
 var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var FilesPage = require('../pages/files.page.js');
+var AdminPage = require('../pages/admin.page.js');
+
+var ShareApi = require('../pages/share_api.page.js');
+var parseXml = require('xml2js').parseString;
+var flow = protractor.promise.controlFlow();
 
 
 describe('Share', function() {
@@ -8,12 +13,16 @@ describe('Share', function() {
   var loginPage;
   var userPage
   var filesPage;
+  var adminPage;
+  var shareApi;
 
   beforeEach(function() {
     isAngularSite(false);
     loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
+    adminPage = new AdminPage(params.baseUrl);
+    shareApi = new ShareApi(params.baseUrl);
   });
 
   it('should login as admin and create 4 new users', function() {
@@ -199,6 +208,127 @@ describe('Share', function() {
     loginPage.login('demo', 'password');
 
     expect(filesPage.checkReshareability('noReshare')).toBeFalsy();
+  });
+
+  it('should not be possible to modify a file shared without edit privileges', function() {
+    loginPage.logout
+    filesPage.getAsUser(params.login.user, params.login.password);
+
+    var createFile = function() {
+      filesPage.createNewTxtFile('noEdits')
+    };
+    var createShare = function() {
+      return shareApi.create('noEdits.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+    filesPage.disableEdit('noEdits.txt', 'demo');
+    filesPage.editTxtFile('noEdits.txt', 'No Edits by User!');
+
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    filesPage.openFile('noEdits.txt');
+    expect(element(filesPage.saveButtonId).toBeDisplayed).toBeFalsy();
+  });
+
+  it('should chage file, when user (not the owner) with privileges edits it', function() {
+    loginPage.logout
+    filesPage.getAsUser(params.login.user, params.login.password);
+
+    var createFile = function() {
+      filesPage.createNewTxtFile('userEdits')
+    };
+    var createShare = function() {
+      return shareApi.create('userEdits.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    filesPage.editTxtFile('userEdits.txt', 'User made edits!');
+    
+    loginPage.logout();
+    loginPage.login(params.login.user, params.login.password);
+    filesPage.openFile('userEdits.txt');    
+    expect(filesPage.getTextContent()).toEqual('User made edits!')
+    filesPage.deleteFile('userEdits.txt');
+  });
+
+  it('should chage file in all users, when owner edits it', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+
+    var createFile = function() {
+      filesPage.createNewTxtFile('ownerEdits')
+    };
+    var createShare = function() {
+      return shareApi.create('ownerEdits.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+    filesPage.editTxtFile('ownerEdits.txt', 'Owner made edits!');
+
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    
+    filesPage.openFile('ownerEdits.txt');    
+    expect(filesPage.getTextContent()).toEqual('Owner made edits!')
+  });
+
+  it('should not be possible to share via link, if admin disabled this option', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    adminPage.get();
+    adminPage.disableLinks();
+    filesPage.get();
+    filesPage.openShareForm('ownerEdits.txt');
+    expect(filesPage.shareLinkCheckBox.toBeDisplayed()).toBeFalsy();
+
+    adminPage.get();
+    adminPage.disableLinks();
+  });
+
+  iit('should show the shared icon on all files and Folders within a shared directory', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    var createFiles = function() {
+      filesPage.createNewFolder('sharedFolder');
+      filesPage.getFolder('sharedFolder');
+      filesPage.createNewTxtFile('sharedFile');
+      filesPage.createNewTxtFile('otherSharedFile');
+      filesPage.createNewFolder('folderInSharedFolder');
+      filesPage.createNewFolder('otherFolderInSharedFolder');
+    };
+
+    var createShare = function() {
+      shareApi.create('sharedFolder', 'demo', 0);
+    }
+   
+    flow.execute(createFiles);
+    flow.execute(createShare);
+
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+
+    filesPage.getFolder('sharedFolder');
+    var sharedFile = element(filesPage.permanentShareButtonId('sharedFile.txt'));
+    var otherSharedFile = element(filesPage.permanentShareButtonId('otherSharedFile.txt'));
+    var folderInSharedFolder = element(filesPage.permanentShareButtonId('folderInSharedFolder'));
+    var otherFolderInSharedFolder = element(filesPage.permanentShareButtonId('otherFolderInSharedFolder'));
+
+    expect(sharedFile.isDisplayed()).toBeTruthy();
+    expect(otherSharedFile.isDisplayed()).toBeTruthy();
+    expect(folderInSharedFolder.isDisplayed()).toBeTruthy();
+    expect(otherFolderInSharedFolder.isDisplayed()).toBeTruthy();
+  });
+
+  iit('should rename a shared folder and it keeps being shared', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    filesPage.renameFile('folderInSharedFolder', 'renamedSharedFolder');
+
+    var renamedSharedFolder = element(filesPage.permanentShareButtonId('renamedSharedFolder'));
+    expect(renamedSharedFolder.isDisplayed()).toBeTruthy();
   });
 
 });

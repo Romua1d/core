@@ -1,7 +1,4 @@
-var ShareApi = require('../pages/shareApi.page.js');
-var LoginPage = require('../pages/login.page.js');
-var UserPage = require('../pages/user.page.js');
-var FilesPage = require('../pages/files.page.js');
+var ShareApi = require('../pages/share_api.page.js');
 var parseXml = require('xml2js').parseString;
 
 var flow = protractor.promise.controlFlow();
@@ -9,10 +6,6 @@ var flow = protractor.promise.controlFlow();
 describe('Share Api', function() {
   var params = browser.params;
   var shareApi;
-  var loginPage;
-  var userPage
-  var filesPage;
-  var firstRunWizardPage;
 
 
   beforeEach(function() {

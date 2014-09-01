@@ -25,12 +25,19 @@ describe('Txt Files', function() {
     expect(filesPage.alertWarning.isDisplayed()).toBeTruthy();
   });
 
-  it('should delete a txt file', function() {
+  iit('should delete a txt file', function() {
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
     filesPage.deleteFile('testText.txt');
-    filesPage.get();
     expect(filesPage.listFiles()).not.toContain('testText')
   });
+
+  iit('should edit a txt file', function() {
+    filesPage.createNewTxtFile('new');
+    filesPage.editTxtFile('new.txt', 'It works');
+    expect(filesPage.getTextContent()).toEqual('It works');
+    filesPage.deleteFile('new.txt');
+  });
+
 });

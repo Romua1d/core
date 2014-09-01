@@ -39,12 +39,17 @@
 
     this.shareWithForm = element(by.id('shareWith'));
     this.sharedWithDropdown = element(by.id('ui-id-1'));
-    // this.textArea = element(by.css('.ace_content'));
-    // this.textLine = element(by.css('.ace_content .ace_line'));
-    // this.saveButton = element(by.id('editor_save'));
+    this.shareLinkCheckBox = element(by.id('linkCheckbox'));
+    this.shareLinkText = element(by.id('linkText'));
+
+    this.textAreaId = by.css('.ace_text-input');
+    this.textLineId = by.css('.ace_line');
+    this.saveButtonId = by.id('editor_save');
   };
 
-//================ LOCATOR FUNCTIONS ====================================//
+//================ LOCATOR FUNCTIONS ===================================================//
+//======================================================================================//
+
   FilesPage.prototype.fileListId = function() {
     return by.css('td.filename .innernametext');
   }
@@ -77,11 +82,25 @@
     return by.css("tr[data-file='" + fileName + "'] .action.action-share");
   };
 
+  FilesPage.prototype.permanentShareButtonId = function(fileName) {
+    return by.css("tr[data-file='" + fileName + "'] .action.action-share.permanent");
+  };
+
+  FilesPage.prototype.disableReshareButtonId = function(userName) {
+    return by.css("li[title='" + userName + "'] label input[name='share']");
+  };
+
+  FilesPage.prototype.disableEditButtonId = function(userName) {
+    return by.css("li[title='" + userName + "'] label input[name='edit']");
+  };
+
   FilesPage.prototype.deleteButtonId = function(fileName) {
     return by.css("tr[data-file='" + fileName +  "'] .action.delete.delete-icon");
   };
 
-//================ SHARED ===============================================//
+
+//================ SHARED ==============================================================//
+//======================================================================================//
  
   FilesPage.prototype.isLoggedIn = function() {
     return this.UserActionDropdown.isPresent().then(function(isLoggedIn) {
@@ -122,7 +141,8 @@
     browser.wait(function() {
       return button.isDisplayed();
     }, 5000, 'load files content');
-  }
+  };
+
   FilesPage.prototype.getSubFolder = function(folder, subFolder) {
     folderUrl = this.folderUrl(folder) + '%2F' + subFolder;
     console.log(folderUrl);
@@ -131,7 +151,7 @@
     browser.wait(function() {
       return button.isDisplayed();
     }, 5000, 'load files content');
-  }
+  };
 
   FilesPage.prototype.listFiles = function() {
     // TODO: waiting to avoid "index out of bound error" 
@@ -147,11 +167,8 @@
     });
   };
 
-//================ SHARED ACTIONS ========================================//
-
-  // FilesPage.prototype.setCurrentListElem = function(name) {
-  //   this.setCurrentListElem = element(by.css("tr[data-file='" + name + "']"));
-  // }
+//================ SHARED ACTIONS ======================================================//
+//======================================================================================//
 
   FilesPage.prototype.openRenameForm = function(fileName) {
     var page = new Page();
@@ -199,7 +216,7 @@
   }
 
   FilesPage.prototype.disableReshare = function(fileName, userName) {
-    var disableReshareButton = element(by.css("li[title='" + userName + "'] label input[name='share']"));
+    var disableReshareButton = element(this.disableReshareButtonId(fileName));
     var dropdown = this.sharedWithDropdown
 
     // this.openShareForm(fileName);
@@ -223,17 +240,21 @@
     });
   };
 
-  // FilesPage.prototype.showFileVersions = function(name) {
-  //   this.moveMouseTo("tr[data-file='"+name+"']");
-  //   var versionId = by.css("tr[data-file='"+name+"'] a.action.action-versions");
-  //   return element(versionId).click();
-  // };
+  FilesPage.prototype.disableEdit = function(fileName, userName) {
+    var disableEditButton = element(this.disableEditButtonId(userName));
+    var dropdown = this.sharedWithDropdown
 
-  // FilesPage.prototype.downloadFile = function(name) {
-  //   this.moveMouseTo("tr[data-file='"+name+"']");
-  //   var downloadId = by.css("tr[data-file='"+name+"'] a.action.action-download");
-  //   return element(downloadId).click();
-  // };
+    this.openShareForm(fileName);
+
+    // TODO: find correct wait trigger
+    //  browser.wait(function(){
+    //   return dropdown.isDisplayed();
+    // }, 3000);s
+
+    // TODO: Timing Workaround
+    browser.sleep(800);
+    disableEditButton.click();
+  };
 
   FilesPage.prototype.restoreFile = function(id) {
     var page = new Page();
@@ -241,7 +262,8 @@
     return element(this.restoreButtonId(id)).click();
   };
 
-//================ TXT FILES ============================================//
+//================ TXT FILES ===========================================================//
+//======================================================================================//
 
   FilesPage.prototype.createNewTxtFile = function(name) {
     this.newButton.click();
@@ -258,7 +280,36 @@
     browser.sleep(800);
   };
 
-//================ FOLDERS ==============================================//
+  FilesPage.prototype.openFile = function(fileName) {
+    element(this.fileListElemNameId(fileName)).click();
+    browser.sleep(800);
+  };
+
+  FilesPage.prototype.writeInFile = function(text) {
+    var textArea = element(this.textAreaId);
+    textArea.sendKeys(text);
+  };
+
+  FilesPage.prototype.saveFile = function() {
+    saveButton = element(this.saveButtonId);
+    saveButton.click();
+  };
+
+  FilesPage.prototype.editTxtFile = function(fileName, text) {
+    this.openFile(fileName);
+    this.writeInFile(text);
+    this.saveFile();
+  },
+
+  FilesPage.prototype.getTextContent = function() {
+    return element(this.textLineId).getText().then( function(text) {
+      return text
+    });
+  }
+
+
+//================ FOLDERS =============================================================//
+//======================================================================================//
 
   FilesPage.prototype.createNewFolder = function(name) {
     this.newButton.click()
@@ -290,28 +341,6 @@
     this.goInToFolder(folderName);
     this.createNewFolder(subFolderName);
   };
-
-//================ NOT WORKING STUFF ====================================//
-
-  // FilesPage.prototype.editFile = function(file) {
-  //   var listElement = element(by.css("tr[data-file='testText.txt'] span.innernametext"));
-  //   listElement.click();
-  //   var textArea = this.textArea;
-  //   browser.pause();
-  //   browser.wait(function() {
-  //     return(textArea.isDisplayed());
-  //   }, 3000, 'load textEditPage');
-  // };
-
-  // FilesPage.prototype.writeInFile = function(text) {
-  //   // this.textArea.click();
-  //   this.textLine.sendKeys(text);
-  // };
-
-  // FilesPage.prototype.saveFile = function() {
-  //   this.saveButton.click();
-  // };
-
 
   module.exports = FilesPage;
 })();
