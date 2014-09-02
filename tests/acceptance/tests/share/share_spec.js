@@ -9,12 +9,13 @@ var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
 
-describe('Share', function() {
+ddescribe('Share', function() {
   var params = browser.params;
   var loginPage;
   var userPage;
   var filesPage;
   var adminPage;
+  var page;
   var shareApi;
 
   beforeEach(function() {
@@ -23,6 +24,7 @@ describe('Share', function() {
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
+    page = new Page();
     shareApi = new ShareApi(params.baseUrl);
   });
 
@@ -291,7 +293,7 @@ describe('Share', function() {
     adminPage.disableLinks();
   });
 
-  it('should show the shared icon on all files and folders within a shared directory', function() {
+  it('should show the shared icon on all files and Folders within a shared directory', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     var createFiles = function() {
       filesPage.createNewFolder('sharedFolder');

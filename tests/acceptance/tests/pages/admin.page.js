@@ -45,9 +45,5 @@
     });
   };
 
-  AdminPage.prototype.disableLinks = function() {
-    this.allowLinksCheckBox.click();
-  }
-
   module.exports = AdminPage;
 })();
