@@ -2,18 +2,20 @@ var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var FilesPage = require('../pages/files.page.js');
 var AdminPage = require('../pages/admin.page.js');
+var Page = require('../helper/page.js');
 
 var ShareApi = require('../pages/share_api.page.js');
 var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
 
-describe('Share', function() {
+ddescribe('Share', function() {
   var params = browser.params;
   var loginPage;
   var userPage
   var filesPage;
   var adminPage;
+  var page;
   var shareApi;
 
   beforeEach(function() {
@@ -22,6 +24,7 @@ describe('Share', function() {
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
+    page = new Page();
     shareApi = new ShareApi(params.baseUrl);
   });
 
@@ -278,19 +281,7 @@ describe('Share', function() {
     expect(filesPage.getTextContent()).toEqual('Owner made edits!')
   });
 
-  it('should not be possible to share via link, if admin disabled this option', function() {
-    filesPage.getAsUser(params.login.user, params.login.password);
-    adminPage.get();
-    adminPage.disableLinks();
-    filesPage.get();
-    filesPage.openShareForm('ownerEdits.txt');
-    expect(filesPage.shareLinkCheckBox.toBeDisplayed()).toBeFalsy();
-
-    adminPage.get();
-    adminPage.disableLinks();
-  });
-
-  iit('should show the shared icon on all files and Folders within a shared directory', function() {
+  it('should show the shared icon on all files and Folders within a shared directory', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     var createFiles = function() {
       filesPage.createNewFolder('sharedFolder');
@@ -303,7 +294,7 @@ describe('Share', function() {
 
     var createShare = function() {
       shareApi.create('sharedFolder', 'demo', 0);
-    }
+    };
    
     flow.execute(createFiles);
     flow.execute(createShare);
@@ -323,12 +314,173 @@ describe('Share', function() {
     expect(otherFolderInSharedFolder.isDisplayed()).toBeTruthy();
   });
 
-  iit('should rename a shared folder and it keeps being shared', function() {
+  it('should rename a shared folder and it keeps being shared', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.renameFile('folderInSharedFolder', 'renamedSharedFolder');
 
     var renamedSharedFolder = element(filesPage.permanentShareButtonId('renamedSharedFolder'));
     expect(renamedSharedFolder.isDisplayed()).toBeTruthy();
+  });
+
+  it('should share a file, if it is mouved in a shared folder', function() {
+    filesPage.getAsUser(params.login.user, params.login.password); 
+    var createFolder = function() {
+    filesPage.createNewFolder('moveItIn');
+    filesPage.createNewTxtFile('moveMeIn');
+    };
+
+    var createShare = function() {
+      shareApi.create('moveItIn', 'demo', 0);
+    };
+
+    flow.execute(createFolder);
+    flow.execute(createShare);
+
+    page.dragAndDrop(filesPage.fileListElemId('moveMeIn.txt'), filesPage.fileListElemId('moveItIn'));
+    filesPage.getFolder('moveItIn');
+    var sharedIcon = element(filesPage.permanentShareButtonId('moveMeIn.txt'));
+    expect(sharedIcon.isDisplayed()).toBeTruthy();
+    filesPage.deleteFile('moveItIn');
+  });
+
+  it('should rename a shared folder and the folder stays shared', function() {
+    filesPage.getAsUser(params.login.user, params.login.password); 
+    var createFolder = function() {
+    filesPage.createNewFolder('sharedFolder3');
+    };
+
+    var createShare = function() {
+      shareApi.create('sharedFolder3', 'demo', 0);
+    };
+
+    flow.execute(createFolder);
+    flow.execute(createShare);
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    filesPage.renameFile('sharedFolder3', 'renamedSharedFolder');
+    browser.sleep(500);
+    expect(element(filesPage.permanentShareButtonId('renamedSharedFolder')).isDisplayed()).toBeTruthy();
+  });
+
+  it('should have access to a shared subfolder', function() {
+    filesPage.getAsUser(params.login.user, params.login.password); 
+    var protrac = protractor.getInstance();
+    var createFolder = function() {
+      filesPage.createNewFolder('sharedFolder4');
+      filesPage.getFolder('sharedFolder4');
+      filesPage.createNewFolder('subFolder');
+    };
+    var createShare = function() {
+      shareApi.create('sharedFolder4', 'demo', 0);
+    };
+
+    flow.execute(createFolder);
+    flow.execute(createShare);
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    filesPage.getSubFolder('sharedFolder4', 'subFolder');
+
+    var expectedUrl = filesPage.folderUrl('sharedFolder4' + '%2F' + 'subFolder');
+
+    protrac.getCurrentUrl().then(function(url) {
+      expect(expectedUrl).toEqual(url);
+    });
+  })
+
+});
+
+
+describe('Admin configs Share', function() {
+  var params = browser.params;
+  var loginPage;
+  var userPage
+  var filesPage;
+  var adminPage;
+  var page;
+  var shareApi;
+
+  beforeEach(function() {
+    isAngularSite(false);
+    loginPage = new LoginPage(params.baseUrl);
+    userPage = new UserPage(params.baseUrl);
+    filesPage = new FilesPage(params.baseUrl);
+    adminPage = new AdminPage(params.baseUrl);
+    page = new Page();
+    shareApi = new ShareApi(params.baseUrl);
+  });
+
+  it('should not be possible to share via link, if admin disabled this option', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    adminPage.get();
+    adminPage.disableOption(adminPage.allowLinksCheckBox);
+    filesPage.get();
+    filesPage.openShareForm('ownerEdits.txt');
+    expect(filesPage.shareLinkCheckBox.toBeDisplayed()).toBeFalsy();
+
+    adminPage.get();
+    adminPage.activateOption(adminPage.allowLinksCheckBox);
+  });
+
+  it('should not be possible to reshare, if admin disabled this option', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    
+    var createFile = function() {
+      filesPage.createNewTxtFile('disabledReshare');
+    };
+
+    var createShare = function() {
+      shareApi.create('disabledReshare.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+
+    adminPage.get();
+    adminPage.disableOption(adminPage.allowResharingCheckBox);
+    loginPage.logout();
+    loginPage.login('demo', 'password');
+    expect(filesPage.checkReshareability('disabledReshare.txt')).toBeFalsy();
+    loginPage.logout();
+  });
+
+  it('should show "can share" option, when admin disabled reshare option', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    filesPage.openShareForm('disabledReshare.txt');
+    expect(element(filesPage.disableReshareButtonId('demo')).isDisplayed()).toBeFalsy();
+  });
+
+  iit('should enforce a password, when sharing a file via link, if admin wishes', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    
+    filesPage.createNewTxtFile('enforceLinkPass');
+
+    adminPage.get();
+    adminPage.activateOption(adminPage.enforceLinkPasswordCheckBox);
+    filesPage.get();
+    filesPage.openShareForm('enforceLinkPass.txt');
+    filesPage.shareLinkCheckBox.click();
+    browser.sleep(500);
+    expect(filesPage.shareLinkPassText.isDisplayed()).toBeTruthy();
+
+    adminPage.get();
+    adminPage.disableOption(adminPage.enforceLinkPasswordCheckBox);
+  });
+
+  iit('should disable all share options, if admin turned off sharing', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    filesPage.get();
+    filesPage.createNewTxtFile('noSharesAtAll')
+
+    adminPage.get();
+    adminPage.disableOption(adminPage.shareAPIEnabledCheckBox);
+
+    filesPage.get();
+    page.moveMouseTo(filesPage.fileListElemId('noSharesAtAll.txt'));
+
+    expect(element(filesPage.shareButtonId('noSharesAtAll.txt')).isPresent()).toBeFalsy();
+
+    adminPage.get();
+    adminPage.activateOption(adminPage.shareAPIEnabledCheckBox);
   });
 
 });

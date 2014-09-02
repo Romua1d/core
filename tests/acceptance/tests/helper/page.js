@@ -95,6 +95,18 @@
 
 		return d.promise;
 	};
+  
+  Page.prototype.moveMouseTo = function(locator) {
+    var elem = element(locator);
+    return browser.actions().mouseMove(elem).perform();
+  }
+
+  Page.prototype.dragAndDrop = function (locator1, locator2) {
+    this.moveMouseTo(locator1);
+    browser.actions().mouseDown().perform();
+    this.moveMouseTo(locator2);
+    browser.actions().mouseUp().perform();
+  }
 
 	module.exports = Page;
 })();

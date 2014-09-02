@@ -41,6 +41,7 @@
     this.sharedWithDropdown = element(by.id('ui-id-1'));
     this.shareLinkCheckBox = element(by.id('linkCheckbox'));
     this.shareLinkText = element(by.id('linkText'));
+    this.shareLinkPassText = element(by.id('linkPassText'));
 
     this.textAreaId = by.css('.ace_text-input');
     this.textLineId = by.css('.ace_line');
