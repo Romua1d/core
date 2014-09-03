@@ -13,13 +13,15 @@
     }
 
     // topbar
-    this.UserActionDropdown = element(by.id("expandDisplayName"));
+    this.displayName = element(by.id("expandDisplayName"));
+    this.userActionDropdown = element(by.id('expanddiv'));
+    this.settingUsers = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]'));
 
     // filelist
     this.selectedFileListId = by.css('tr.searchresult td.filename .innernametext');
     this.firstListElem = element(by.css('#fileList tr:first-child'));
 
-    // new Button and sublist
+    // new Button and dropdownlist elements
     this.newButton = element(by.css('#new a'));
     this.newTextButton = element(by.css('li.icon-filetype-text.svg'));
     this.newFolderButton = element(by.css('li.icon-filetype-folder.svg'));
@@ -36,16 +38,27 @@
     this.modifiedSortArrow = element(by.id('modified'));
 
     this.searchInput = element(by.id('searchbox'));
-
+    
+    // share
     this.shareWithForm = element(by.id('shareWith'));
     this.sharedWithDropdown = element(by.id('ui-id-1'));
     this.shareLinkCheckBox = element(by.id('linkCheckbox'));
     this.shareLinkText = element(by.id('linkText'));
     this.shareLinkPassText = element(by.id('linkPassText'));
 
+    //  edit txt file
     this.textAreaId = by.css('.ace_text-input');
     this.textLineId = by.css('.ace_line');
     this.saveButtonId = by.id('editor_save');
+
+    // upload
+    this.uploadButton = element(by.id('file_upload_start'));
+
+    // filter
+    this.filterAllFiles = element(by.css('.nav-files'));
+    this.filterSharedWhithYou = element(by.css('.nav-sharingin'));
+    this.filterSharedWhithOthers = element(by.css('.nav-sharingout'));
+
   };
 
 //================ LOCATOR FUNCTIONS ===================================================//
@@ -104,7 +117,7 @@
 //======================================================================================//
  
   FilesPage.prototype.isLoggedIn = function() {
-    return this.UserActionDropdown.isPresent().then(function(isLoggedIn) {
+    return this.displayName.isPresent().then(function(isLoggedIn) {
       return isLoggedIn;
     });
   }

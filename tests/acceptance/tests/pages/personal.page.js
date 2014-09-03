@@ -24,15 +24,7 @@
   PersonalPage.prototype.isUserPage = function() {
     return browser.driver.getCurrentUrl() == this.url;
   };
-  
-  PersonalPage.prototype.ensurePersonalPage = function() {
-    // console.log(this.isUserPage());
-    // if (! this.isUserPage()) {
-    //   display.log('Warning: Auto loading UserPage');
-    //   this.get();
-    // }
-  };
-  
+ 
   PersonalPage.prototype.changePassword = function(oldPass, newPass) {
     this.ensurePersonalPage();
     this.oldPasswordInput.sendKeys(oldPass);

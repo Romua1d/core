@@ -11,6 +11,8 @@
     this.newGroupButton = element(by.css('#newgroup-init a'));
     this.newGroupNameInput = element(by.css('#newgroup-form input#newgroupname'));
 
+    this.userFilter = element(by.css('.userFilter'));
+
   };
 
   UserPage.prototype.get = function() {
@@ -32,6 +34,7 @@
   UserPage.prototype.fillNewUserInput = function(user, pass) {
     this.ensureUserPage();
     this.newUserNameInput.sendKeys(user);
+    browser.sleep(100);
     this.newUserPasswordInput.sendKeys(pass);
   };
   
@@ -63,6 +66,12 @@
     var renameDisplayNameButton = element(by.css("tr[data-uid='" + name + "'] td.displayName"));
     renameDisplayNameButton.click();
     var renameDisplayNameForm = element(by.css("tr[data-uid='" + name + "'] td.displayName input"));
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(newName);
     renameDisplayNameForm.sendKeys(protractor.Key.ENTER);
   };

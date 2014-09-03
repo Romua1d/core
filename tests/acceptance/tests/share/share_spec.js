@@ -9,10 +9,10 @@ var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
 
-ddescribe('Share', function() {
+describe('Share', function() {
   var params = browser.params;
   var loginPage;
-  var userPage
+  var userPage;
   var filesPage;
   var adminPage;
   var page;
@@ -449,7 +449,7 @@ describe('Admin configs Share', function() {
     expect(element(filesPage.disableReshareButtonId('demo')).isDisplayed()).toBeFalsy();
   });
 
-  iit('should enforce a password, when sharing a file via link, if admin wishes', function() {
+  it('should enforce a password, when sharing a file via link, if admin wishes', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     
     filesPage.createNewTxtFile('enforceLinkPass');
@@ -466,7 +466,7 @@ describe('Admin configs Share', function() {
     adminPage.disableOption(adminPage.enforceLinkPasswordCheckBox);
   });
 
-  iit('should disable all share options, if admin turned off sharing', function() {
+  it('should disable all share options, if admin turned off sharing', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.get();
     filesPage.createNewTxtFile('noSharesAtAll')

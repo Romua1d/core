@@ -14,10 +14,10 @@ describe('Sort', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
   });
 
-  it('shloud sort files by name', function() {
+  it('should sort files by name', function() {
     expect(filesPage.firstListElem == element(filesPage.fileListElemId("documents"))).toBeTruthy;
     filesPage.nameSortArrow.click();
-    expect(filesPage.firstListElem == element(filesPage.fileListElemId("ownCloudUserManual.pdf"))).toBeTruthy;
+    expect(filesPage.firstListElem == element(filesPage.fileListElemId("ownCouldUserManual.pdf"))).toBeTruthy;
   });
 
   it('should sort files by size', function() {

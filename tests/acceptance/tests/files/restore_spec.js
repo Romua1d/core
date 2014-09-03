@@ -1,5 +1,7 @@
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
+var ShareApi = require('../pages/share_api.page.js');
+var flow = protractor.promise.controlFlow();
 
 // ============================ RESTORE FOLDERS ====================================================== //
 // =================================================================================================== //
@@ -95,16 +97,18 @@ describe('Restore Folders', function() {
 });
 
 
-// ============================ RESTORE FOLDERS ====================================================== //
+// ============================ RESTORE FILES ======================================================== //
 // =================================================================================================== //
 
 describe('Restore Files', function() {
   var params = browser.params;
   var filesPage;
+  var shareApi;
   
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
+    shareApi = new ShareApi(params.baseUrl);
     filesPage.getAsUser(params.login.user, params.login.password);
   });
 
@@ -148,4 +152,32 @@ describe('Restore Files', function() {
     filesPage.deleteFile('sameFileName.txt');
     filesPage.deleteFile('sameFileName (Wiederhergestellt).txt');
   });
+
+  iit('should restore a shared file and it stays shared', function() {
+
+    var createFile = function() {
+      filesPage.createNewTxtFile('restoredShared');
+    };
+
+    var createShare = function() {
+      shareApi.create('restoredShared.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+
+    filesPage.deleteFile('restoredShared.txt');
+    browser.sleep(800);
+    filesPage.trashbinButton.click();
+    browser.wait(function() {
+      return(filesPage.listFiles());
+    }, 3000);
+    filesPage.restoreFile(0);
+    filesPage.get();
+
+    expect(filesPage.listFiles()).toContain('restoredShared');
+    filesPage.deleteFile('restoredShared.txt');
+
+  });
+
 });
