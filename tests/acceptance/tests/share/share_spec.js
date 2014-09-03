@@ -9,7 +9,7 @@ var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
 
-ddescribe('Share', function() {
+describe('Share', function() {
   var params = browser.params;
   var loginPage;
   var userPage;

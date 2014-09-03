@@ -1,38 +1,27 @@
 var Page = require('../helper/page.js');
 var FilesPage = require('../pages/files.page.js');
 var UserPage = require('../pages/user.page.js');
-var LoginPage = require('../pages/login.page.js');
 var protrac = protractor.getInstance();
 
 describe('Users', function() {
   var params = browser.params;
-  var page;
   var filesPage;
   var userPage;
-  var loginPage
 
   beforeEach(function() {
     isAngularSite(false);
-    page = new Page();
     filesPage = new FilesPage(params.baseUrl);
-    userPage = new UserPage(params.baseUrl);
-    loginPage = new LoginPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    userPage = new UserPage(params.baseUrl);    
+    userPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should access settings > users ', function() {
-    page.displayName.click();
-    browser.wait(function() {
-      return page.userActionDropdown.isDisplayed();
-    })
-    page.settingUsers.click();
-
     protrac.getCurrentUrl().then(function(url) {
       expect(userPage.url).toEqual(url);
     });
   });
 
-  it('should create 10 users with password', function() {
+  it('should create 15 users with password', function() {
     userPage.createNewUser('demo01', 'password');
     userPage.createNewUser('demo02', 'password');
     userPage.createNewUser('demo03', 'password');
@@ -52,8 +41,7 @@ describe('Users', function() {
     expect(userPage.listUser()).toContain(
       'demo01', 'demo02', 'demo03', 'demo04', 'demo05', 
       'demo06', 'demo07', 'demo08', 'demo09', 'demo10',
-      'demo11', 'demo12', 'demo13', 'demo14', 
-      'demo15'
+      'demo11', 'demo12', 'demo13', 'demo14', 'demo15'
     );
 
     userPage.get();
@@ -72,14 +60,11 @@ describe('Users', function() {
   }); 
 
   it('should change displayname', function() {
-    userPage.renameDisplayName('admin', 'Manfred Mustermann');
     userPage.renameDisplayName('demo01', 'Kevin Klever');
     userPage.renameDisplayName('demo02', 'Gundula Gaus');
     userPage.renameDisplayName('demo03', 'Petra Pan');
-    userPage.get();
-    page.displayName.getText().then(function(displayName) {
-      expect(displayName).toEqual('Manfred Mustermann');
-    })
+
+    // TODO
   });
 
   it('should filter users', function() {
@@ -89,7 +74,7 @@ describe('Users', function() {
     expect(userPage.listUser()).toContain('Kevin Klever');  
   });
 
-  iit('should show warning, if create a user that allready exists', function() {
+  it('should show warning, if create a user that allready exists', function() {
     userPage.get();
     userPage.createNewUser('demo01', 'password');
     browser.wait(function() {
@@ -99,7 +84,7 @@ describe('Users', function() {
 
   });
 
-  iit('should change password for users as admin', function() {
+  it('should change password for users as admin', function() {
     userPage.changeUserPass('demo01', 'changedPass');
     loginPage.logout();
     loginPage.login('demo01', 'changedPass');
@@ -109,5 +94,4 @@ describe('Users', function() {
       expect(filesPage.url).toEqual(url);
     });
   });
-
 });

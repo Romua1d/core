@@ -107,12 +107,14 @@
     var renameDisplayNameButton = element(this.renameDisplayNameButtonId(userName));
     renameDisplayNameButton.click();
     var renameDisplayNameForm = element(this.renameDisplayNameFormId(userName));
+    // TODO: Workaround, fixme
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
+    
     renameDisplayNameForm.sendKeys(newUserName);
     renameDisplayNameForm.sendKeys(protractor.Key.ENTER);
   };

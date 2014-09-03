@@ -154,7 +154,6 @@ describe('Restore Files', function() {
   });
 
   it('should restore a shared file and it stays shared', function() {
-
     var createFile = function() {
       filesPage.createNewTxtFile('restoredShared');
     };
