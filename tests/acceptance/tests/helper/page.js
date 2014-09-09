@@ -11,10 +11,10 @@
 /* global protractor, module, element, by, browser */
 (function() {
 	var Page = function() {
-    // this.displayName = element(by.id("expandDisplayName"));
-    // this.userActionDropdown = element(by.id('expanddiv'));
-    // this.settingUsers = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]'));
-    // this.settingPersonal = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/personal"]'));
+    this.displayName = element(by.id("expandDisplayName"));
+    this.userActionDropdown = element(by.id('expanddiv'));
+    this.settingUsers = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]'));
+    this.settingPersonal = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/personal"]'));
 	};
 
 	Page.prototype.moveMouseTo = function(locator) {

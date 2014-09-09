@@ -41,7 +41,8 @@ describe('Users', function() {
     expect(userPage.listUser()).toContain(
       'demo01', 'demo02', 'demo03', 'demo04', 'demo05', 
       'demo06', 'demo07', 'demo08', 'demo09', 'demo10',
-      'demo11', 'demo12', 'demo13', 'demo14', 'demo15'
+      'demo11', 'demo12', 'demo13', 'demo14', 
+      'demo15'
     );
 
     userPage.get();
@@ -64,7 +65,10 @@ describe('Users', function() {
     userPage.renameDisplayName('demo02', 'Gundula Gaus');
     userPage.renameDisplayName('demo03', 'Petra Pan');
 
-    // TODO
+    userPage.get();
+    page.displayName.getText().then(function(displayName) {
+      expect(displayName).toEqual('Manfred Mustermann');
+    })
   });
 
   it('should filter users', function() {

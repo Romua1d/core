@@ -114,7 +114,7 @@
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
-    
+
     renameDisplayNameForm.sendKeys(newUserName);
     renameDisplayNameForm.sendKeys(protractor.Key.ENTER);
   };
