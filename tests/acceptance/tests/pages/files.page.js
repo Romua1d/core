@@ -4,18 +4,13 @@
 
   var FilesPage = function(baseUrl) {
     this.baseUrl = baseUrl;
-    this.path = 'index.php/apps/files';
+    this.path = 'index.php/apps/files/';
     this.url = baseUrl + this.path;
 
     var url = this.url
     this.folderUrl = function(folder) {
       return url + '/?dir=%2F' + folder
     }
-
-    // topbar
-    this.displayName = element(by.id("expandDisplayName"));
-    this.userActionDropdown = element(by.id('expanddiv'));
-    this.settingUsers = element(by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]'));
 
     // filelist
     this.selectedFileListId = by.css('tr.searchresult td.filename .innernametext');
@@ -117,7 +112,8 @@
 //======================================================================================//
  
   FilesPage.prototype.isLoggedIn = function() {
-    return this.displayName.isPresent().then(function(isLoggedIn) {
+    var page = new Page();
+    return page.displayName.isPresent().then(function(isLoggedIn) {
       return isLoggedIn;
     });
   }

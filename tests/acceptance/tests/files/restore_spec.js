@@ -153,7 +153,7 @@ describe('Restore Files', function() {
     filesPage.deleteFile('sameFileName (Wiederhergestellt).txt');
   });
 
-  iit('should restore a shared file and it stays shared', function() {
+  it('should restore a shared file and it stays shared', function() {
 
     var createFile = function() {
       filesPage.createNewTxtFile('restoredShared');

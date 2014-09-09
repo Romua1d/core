@@ -1,4 +1,6 @@
 (function() {  
+  var Page = require('../helper/page.js');
+
   var UserPage = function(baseUrl) {
     this.baseUrl = baseUrl;
     this.path = 'index.php/settings/users';
@@ -13,7 +15,35 @@
 
     this.userFilter = element(by.css('.userFilter'));
 
+    this.warningDialog = element(by.css('.oc-dialog'));
   };
+
+// ================ LOCATORS ==================================================================== //
+// ============================================================================================== //
+
+  UserPage.prototype.renameDisplayNameButtonId = function(userName) {
+    return by.css("tr[data-uid='" + userName + "'] td.displayName");
+  };
+
+  UserPage.prototype.renameDisplayNameFormId = function(userName) {
+    return by.css("tr[data-uid='" + userName + "'] td.displayName input");
+  };
+
+  UserPage.prototype.userPassButtonId = function(userName) {
+    return by.css('#userlist tr[data-uid="' + userName + '"] td.password');
+  };
+
+  UserPage.prototype.userPassFormId = function(userName) {
+    return by.css('#userlist tr[data-uid="' + userName + '"] td.password input');
+  };
+  
+  UserPage.prototype.removeUserButtonId = function(userName) {
+    return by.css('#userlist tr[data-uid="' + userName + '"] td.remove a');
+  };
+
+
+// ================ ACTIONS ===================================================================== //
+// ============================================================================================== //
 
   UserPage.prototype.get = function() {
     browser.get(this.url);
@@ -39,40 +69,51 @@
   };
   
   UserPage.prototype.createNewUser = function(user, pass) {
-    this.ensureUserPage();
     this.fillNewUserInput(user, pass);
     this.createNewUserButton.click();
   };
   
-  UserPage.prototype.deleteUser = function(user) {
-    this.ensureUserPage();
+  UserPage.prototype.deleteUser = function(userName) {
+    var page = new Page();
+    var deleteButton = element(this.removeUserButtonId(userName));
+
+    page.moveMouseTo(this.removeUserButtonId(userName));
+    deleteButton.click();
     
-    var removeId = by.css('#userlist tr[data-displayname="' + user + '"] td.remove a');
-    var filter = browser.findElement(removeId);
-    var scrollIntoView = function () {
-      arguments[0].scrollIntoView();
-    }
-    browser.executeScript(scrollIntoView, filter).then(function () {
-      browser.actions().mouseMove(browser.findElement(removeId)).perform();
-      element(removeId).click();
-    });
+    // var filter = browser.findElement(removeId);
+    // var scrollIntoView = function () {
+    //   arguments[0].scrollIntoView();
+    // }
+    // browser.executeScript(scrollIntoView, filter).then(function () {
+    //   browser.actions().mouseMove(browser.findElement(removeId)).perform();
+    //   element(removeId).click();
+    // });
   };
+
+  UserPage.prototype.changeUserPass = function(userName, pass) {
+    var passForm = element(this.userPassFormId(userName));
+
+    element(this.userPassButtonId(userName)).click().then(function() {
+      passForm.sendKeys(pass);
+      passForm.sendKeys(protractor.Key.ENTER);
+    });
+  }
 
   UserPage.prototype.setCurrentListElem = function(name) {
     return element(by.css("tr[data-uid='" + name + "']"));
   }
 
-  UserPage.prototype.renameDisplayName = function(name, newName) {
-    var renameDisplayNameButton = element(by.css("tr[data-uid='" + name + "'] td.displayName"));
+  UserPage.prototype.renameDisplayName = function(userName, newUserName) {
+    var renameDisplayNameButton = element(this.renameDisplayNameButtonId(userName));
     renameDisplayNameButton.click();
-    var renameDisplayNameForm = element(by.css("tr[data-uid='" + name + "'] td.displayName input"));
+    var renameDisplayNameForm = element(this.renameDisplayNameFormId(userName));
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
     renameDisplayNameForm.sendKeys(protractor.Key.DELETE);
-    renameDisplayNameForm.sendKeys(newName);
+    renameDisplayNameForm.sendKeys(newUserName);
     renameDisplayNameForm.sendKeys(protractor.Key.ENTER);
   };
   

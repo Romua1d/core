@@ -1,25 +1,31 @@
+var Page = require('../helper/page.js');
 var FilesPage = require('../pages/files.page.js');
 var UserPage = require('../pages/user.page.js');
+var LoginPage = require('../pages/login.page.js');
+var protrac = protractor.getInstance();
 
 describe('Users', function() {
   var params = browser.params;
+  var page;
   var filesPage;
   var userPage;
+  var loginPage
 
   beforeEach(function() {
     isAngularSite(false);
+    page = new Page();
     filesPage = new FilesPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
+    loginPage = new LoginPage(params.baseUrl);
     filesPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should access settings > users ', function() {
-    var protrac = protractor.getInstance();
-    filesPage.displayName.click();
+    page.displayName.click();
     browser.wait(function() {
-      return filesPage.userActionDropdown.isDisplayed();
+      return page.userActionDropdown.isDisplayed();
     })
-    filesPage.settingUsers.click();
+    page.settingUsers.click();
 
     protrac.getCurrentUrl().then(function(url) {
       expect(userPage.url).toEqual(url);
@@ -46,8 +52,10 @@ describe('Users', function() {
     expect(userPage.listUser()).toContain(
       'demo01', 'demo02', 'demo03', 'demo04', 'demo05', 
       'demo06', 'demo07', 'demo08', 'demo09', 'demo10',
-      'demo11', 'demo12', 'demo13', 'demo14', 'demo15'
+      'demo11', 'demo12', 'demo13', 'demo14', 
+      'demo15'
     );
+
     userPage.get();
     userPage.deleteUser('demo04');
     userPage.deleteUser('demo05');
@@ -68,9 +76,8 @@ describe('Users', function() {
     userPage.renameDisplayName('demo01', 'Kevin Klever');
     userPage.renameDisplayName('demo02', 'Gundula Gaus');
     userPage.renameDisplayName('demo03', 'Petra Pan');
-
     userPage.get();
-    filesPage.displayName.getText().then(function(displayName) {
+    page.displayName.getText().then(function(displayName) {
       expect(displayName).toEqual('Manfred Mustermann');
     })
   });
@@ -81,4 +88,26 @@ describe('Users', function() {
     browser.sleep(1000);
     expect(userPage.listUser()).toContain('Kevin Klever');  
   });
+
+  iit('should show warning, if create a user that allready exists', function() {
+    userPage.get();
+    userPage.createNewUser('demo01', 'password');
+    browser.wait(function() {
+      return userPage.warningDialog.isPresent();
+    });
+    expect(userPage.warningDialog.isDisplayed()).toBeTruthy();
+
+  });
+
+  iit('should change password for users as admin', function() {
+    userPage.changeUserPass('demo01', 'changedPass');
+    loginPage.logout();
+    loginPage.login('demo01', 'changedPass');
+
+
+    protrac.getCurrentUrl().then(function(url) {
+      expect(filesPage.url).toEqual(url);
+    });
+  });
+
 });

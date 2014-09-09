@@ -63,6 +63,7 @@ describe('Txt Files', function() {
     filesPage.createNewTxtFile('new');
     filesPage.editTxtFile('new.txt', 'It works');
     expect(filesPage.getTextContent()).toEqual('It works');
+    filesPage.get();
     filesPage.deleteFile('new.txt');
   });
 

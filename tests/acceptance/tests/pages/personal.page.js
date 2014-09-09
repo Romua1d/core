@@ -26,7 +26,6 @@
   };
  
   PersonalPage.prototype.changePassword = function(oldPass, newPass) {
-    this.ensurePersonalPage();
     this.oldPasswordInput.sendKeys(oldPass);
     this.newPasswordInput.sendKeys(newPass);
     this.newPasswordButton.click();
@@ -43,6 +42,17 @@
       });
       return ready;
     }, 8000, 'personal password change result not displayed');
+  };
+
+  PersonalPage.prototype.changeDisplayName = function(newDisplayName) {
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(protractor.Key.BACK_SPACE);
+    this.displaynameInput.sendKeys(newDisplayName);
+    this.displaynameInput.sendKeys(protractor.Key.ENTER);
   };
   
   module.exports = PersonalPage;
