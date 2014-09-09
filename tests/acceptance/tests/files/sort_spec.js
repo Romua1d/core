@@ -1,4 +1,4 @@
-var LoginPage = require('../pages/login.page.js');
+var Page = require('../helper/page.js');
 var FilesPage = require('../pages/files.page.js');
 
 // ============================ SORT ================================================================= //
@@ -11,7 +11,7 @@ describe('Sort', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    Page.getAsUser(params.login.user, params.login.password);
   });
 
   it('should sort files by name', function() {

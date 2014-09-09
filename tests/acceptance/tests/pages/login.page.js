@@ -19,7 +19,6 @@
   };
   
   LoginPage.prototype.isCurrentPage = function() {
-    
     return this.loginForm.isPresent();
   };
   

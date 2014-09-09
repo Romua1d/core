@@ -1,3 +1,4 @@
+var Page = require('../helper/page.js')
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 var UserPage = require('../pages/user.page.js');
@@ -15,16 +16,16 @@ describe('Txt Files', function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
     loginPage = new LoginPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    Page.getAsUser(params.login.user, params.login.password);
   });
 
   it('should create a new txt file', function() {
-    filesPage.createNewTxtFile('testText');
+    filesPage.createTxtFile('testText');
     expect(filesPage.listFiles()).toContain('testText');
   });
 
   it('should not create new file if filename already exists', function() {
-    filesPage.createNewTxtFile('testText');
+    filesPage.createTxtFile('testText');
     expect(filesPage.alertWarning.isDisplayed()).toBeTruthy();
   });
 
@@ -44,7 +45,7 @@ describe('Txt Files', function() {
     userPage.createNewUser('demo', 'password');
 
     filesPage.get();
-    filesPage.createNewTxtFile('toDeleteByUser');
+    filesPage.createTxtFile('toDeleteByUser');
     filesPage.shareFile('toDeleteByUser.txt', 'demo');
 
     loginPage.logout();
@@ -60,7 +61,7 @@ describe('Txt Files', function() {
   });
 
   it('should edit a txt file', function() {
-    filesPage.createNewTxtFile('new');
+    filesPage.createTxtFile('new');
     filesPage.editTxtFile('new.txt', 'It works');
     expect(filesPage.getTextContent()).toEqual('It works');
     filesPage.get();

@@ -1,3 +1,4 @@
+var Page = require('../helper/page.js')
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 
@@ -11,16 +12,16 @@ describe('Search', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    Page.getAsUser(params.login.user, params.login.password);
   });
 
   it('should search files by name', function() {
-    filesPage.createNewTxtFile('searchFile');
-    filesPage.createNewFolder('searchFolder');
+    filesPage.createTxtFile('searchFile');
+    filesPage.createFolder('searchFolder');
     filesPage.searchInput.click();
     filesPage.searchInput.sendKeys('search');
     expect(filesPage.listSelctedFiles()).toContain('searchFile', 'searchFolder');
     filesPage.deleteFile('searchFile.txt');
-    filesPage.deleteFile('searchFolder');
+    filesPage.deleteFolder('searchFolder');
   });
 });

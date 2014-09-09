@@ -2,8 +2,8 @@ var Page = require('../helper/page.js')
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 
-// =============================================== RENAME FOLDER =================================== //
-// ================================================================================================= //
+//================ FOLDERS =============================================================//
+//======================================================================================//
 
 describe('Rename Folder', function() {
   var params = browser.params;
@@ -14,12 +14,12 @@ describe('Rename Folder', function() {
     isAngularSite(false);
     page = new Page();
     filesPage = new FilesPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    Page.getAsUser(params.login.user, params.login.password);
   });
 
   it('should rename a folder', function() {
-    filesPage.createNewFolder('testFolder');
-    filesPage.renameFile('testFolder', 'newFolder');
+    filesPage.createFolder('testFolder');
+    filesPage.renameFolder('testFolder', 'newFolder');
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
@@ -27,8 +27,8 @@ describe('Rename Folder', function() {
   });
 
   it('should show alert message if foldername already in use', function() {
-    filesPage.createNewFolder('testFolder');
-    filesPage.renameFile('testFolder', 'newFolder');
+    filesPage.createFolder('testFolder');
+    filesPage.renameFolder('testFolder', 'newFolder');
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
@@ -36,7 +36,7 @@ describe('Rename Folder', function() {
   });
 
   it('should show alert message if using forbidden characters', function() {
-    filesPage.renameFile('newFolder', 'new:Folder');
+    filesPage.renameFolder('newFolder', 'new:Folder');
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
@@ -45,7 +45,7 @@ describe('Rename Folder', function() {
 
   it('should rename a file using special characters', function() {
     filesPage.get(); // TODO: reload cause warning alerts don't disappear
-    filesPage.renameFile('testFolder', 'sP€c!@L B-)');
+    filesPage.renameFolder('testFolder', 'sP€c!@L B-)');
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
@@ -53,33 +53,31 @@ describe('Rename Folder', function() {
   });
 
   it('should show alert message if newName is empty', function() {
-    filesPage.renameFile('newFolder', "");
+    filesPage.renameFolder('newFolder', "");
     browser.wait(function() {
       return(filesPage.listFiles());
     }, 3000);
     expect(filesPage.alertWarning.isDisplayed()).toBeTruthy();
-    filesPage.deleteFile('newFolder');
-    filesPage.deleteFile('sP€c!@L B-)');
+    filesPage.deleteFolder('newFolder');
+    filesPage.deleteFolder('sP€c!@L B-)');
   });
 }); 
 
-// =============================================== RENAME FILES ==================================== //
-// ================================================================================================= //
+//================ FILES ===============================================================//
+//======================================================================================//
 
 describe('Rename Files', function() {
   var params = browser.params;
-  var page;
   var filesPage;
   
   beforeEach(function() {
     isAngularSite(false);
-    page = new Page();
     filesPage = new FilesPage(params.baseUrl);
-    filesPage.getAsUser(params.login.user, params.login.password);
+    Page.getAsUser(params.login.user, params.login.password);
   });
 
   it('should rename a txt file', function() {
-    filesPage.createNewTxtFile('testText');
+    filesPage.createTxtFile('testText');
     filesPage.renameFile('testText.txt', 'newText.txt');
     browser.wait(function() {
       return(filesPage.listFiles());
@@ -88,7 +86,7 @@ describe('Rename Files', function() {
   });
 
   it('should show alert message if filename is already in use', function() {
-    filesPage.createNewTxtFile('testText');
+    filesPage.createTxtFile('testText');
     filesPage.renameFile('testText.txt', 'newText.txt');
     browser.wait(function() {
       return(filesPage.listFiles());

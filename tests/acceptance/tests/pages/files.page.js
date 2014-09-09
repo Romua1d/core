@@ -106,16 +106,9 @@
     return by.css("tr[data-file='" + fileName +  "'] .action.delete.delete-icon");
   };
 
-
-//================ SHARED ==============================================================//
+//================ NAVIGATION ==========================================================//
 //======================================================================================//
- 
-  FilesPage.prototype.isLoggedIn = function() {
-    var page = new Page();
-    return page.displayName.isPresent().then(function(isLoggedIn) {
-      return isLoggedIn;
-    });
-  }
+
 
   FilesPage.prototype.get = function() { 
     browser.get(this.url);
@@ -126,26 +119,21 @@
     }, 5000, 'load files content');
   };
 
-  FilesPage.prototype.getAsUser = function(name, pass) { 
-    var loginPage;
-    loginPage = new LoginPage(this.baseUrl);
-
-    this.isLoggedIn().then(function(isLoggedIn) {
-      if(isLoggedIn) {
-        // console.log('isLoggedIn: ' + isLoggedIn);
-        return false
-      } else {
-        console.log('isLoggedIn: ' + isLoggedIn);
-        browser.manage().deleteAllCookies(); // logout the hard way
-        loginPage.get();
-        loginPage.login(name, pass);
-      }
-    });
-  };
-
   FilesPage.prototype.getFolder = function(folder) {
     folderUrl = this.folderUrl(folder);
     browser.get(folderUrl);
+    var button = this.newButton;
+    browser.wait(function() {
+      return button.isDisplayed();
+    }, 5000, 'load files content');
+  };
+
+
+  FilesPage.prototype.goInToFolder = function(fileName) {
+    var page = new Page();
+
+    page.moveMouseTo(this.fileListElemId(fileName));
+    element(this.fileListElemNameId(fileName)).click();
     var button = this.newButton;
     browser.wait(function() {
       return button.isDisplayed();
@@ -162,6 +150,9 @@
     }, 5000, 'load files content');
   };
 
+//================ FILELIST ============================================================//
+//======================================================================================//
+
   FilesPage.prototype.listFiles = function() {
     // TODO: waiting to avoid "index out of bound error" 
     browser.sleep(800);
@@ -176,7 +167,7 @@
     });
   };
 
-//================ SHARED ACTIONS ======================================================//
+//================ RENAMING ============================================================//
 //======================================================================================//
 
   FilesPage.prototype.openRenameForm = function(fileName) {
@@ -200,12 +191,27 @@
     });
   };
 
+  FilesPage.prototype.renameFolder = function(fileName, newFileName) {
+    this.renameFile(fileName, newFileName);
+  };
+
+//================ DELETE ==============================================================//
+//======================================================================================//
+
   FilesPage.prototype.deleteFile = function(fileName) {
     var page = new Page();
 
     page.moveMouseTo(this.fileListElemId(fileName));
     return element(this.deleteButtonId(fileName)).click();
   };
+
+  FilesPage.prototype.deleteFolder = function(folderName) {
+    return this.deleteFile(folderName);
+  };
+
+//================ SHARE ===============================================================//
+//======================================================================================//
+
 
   FilesPage.prototype.openShareForm = function(fileName) {
     var page = new Page();
@@ -222,6 +228,10 @@
       return dropdown.isDisplayed();
     }, 3000);
     this.shareWithForm.sendKeys(protractor.Key.ENTER);
+  }
+
+  FilesPage.prototype.shareFolder = function(folderName, userName) {
+    this.shareFile(folderName);
   }
 
   FilesPage.prototype.disableReshare = function(fileName, userName) {
@@ -264,16 +274,24 @@
     disableEditButton.click();
   };
 
+
+//================ RESTORE =============================================================//
+//======================================================================================//
+
   FilesPage.prototype.restoreFile = function(id) {
     var page = new Page();
     page.moveMouseTo(this.restoreListElemId(id));
     return element(this.restoreButtonId(id)).click();
   };
 
-//================ TXT FILES ===========================================================//
+  FilesPage.prototype.restoreFolder = function(id) {
+    this.restoreFile(id);
+  };
+
+//================ CREATE ==============================================================//
 //======================================================================================//
 
-  FilesPage.prototype.createNewTxtFile = function(name) {
+  FilesPage.prototype.createTxtFile = function(name) {
     this.newButton.click();
     this.newTextButton.click();
     this.newTextnameForm.sendKeys(name); 
@@ -287,6 +305,30 @@
     // TODO: Timing Workaround
     browser.sleep(800);
   };
+
+  FilesPage.prototype.createFolder = function(name) {
+    this.newButton.click()
+    this.newFolderButton.click();
+    this.newFoldernameForm.sendKeys(name); 
+    this.newFoldernameForm.sendKeys(protractor.Key.ENTER);
+
+    // TODO: find correct wait trigger
+    // browser.wait(function() {
+    //  // return 
+    // });
+
+    // TODO: Timing Workaround
+    browser.sleep(800);
+  };
+
+
+  FilesPage.prototype.createSubFolder = function(folderName, subFolderName) {
+    this.goInToFolder(folderName);
+    this.createNewFolder(subFolderName);
+  };
+
+//================ EDIT TXT ============================================================//
+//======================================================================================//
 
   FilesPage.prototype.openFile = function(fileName) {
     element(this.fileListElemNameId(fileName)).click();
@@ -314,41 +356,6 @@
       return text
     });
   }
-
-
-//================ FOLDERS =============================================================//
-//======================================================================================//
-
-  FilesPage.prototype.createNewFolder = function(name) {
-    this.newButton.click()
-    this.newFolderButton.click();
-    this.newFoldernameForm.sendKeys(name); 
-    this.newFoldernameForm.sendKeys(protractor.Key.ENTER);
-
-    // TODO: find correct wait trigger
-    // browser.wait(function() {
-    //  // return 
-    // });
-
-    // TODO: Timing Workaround
-    browser.sleep(800);
-  };
-
-  FilesPage.prototype.goInToFolder = function(fileName) {
-    var page = new Page();
-
-    page.moveMouseTo(this.fileListElemId(fileName));
-    element(this.fileListElemNameId(fileName)).click();
-    var button = this.newButton;
-    browser.wait(function() {
-      return button.isDisplayed();
-    }, 5000, 'load files content');
-  };
-
-  FilesPage.prototype.createSubFolder = function(folderName, subFolderName) {
-    this.goInToFolder(folderName);
-    this.createNewFolder(subFolderName);
-  };
 
   module.exports = FilesPage;
 })();

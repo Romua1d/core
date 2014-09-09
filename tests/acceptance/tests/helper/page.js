@@ -54,62 +54,95 @@
 	 * @param el select element of the multiselect
 	 * @param {Array} id of the values to select
 	 */
-	Page.multiSelectSetSelection = function(el, selection) {
-		var d = protractor.promise.defer();
-		var dropDownEl = element(by.css('.multiselectoptions.down'));
+  Page.multiSelectSetSelection = function(el, selection) {
+    var d = protractor.promise.defer();
+    var dropDownEl = element(by.css('.multiselectoptions.down'));
 
-		el.click();
+    el.click();
 
-		function processEntry(entry) {
-			entry.isSelected().then(function(selected) {
-				entry.getAttribute('id').then(function(inputId) {
-					// format is "ms0-option-theid", we extract that id
-					var dataId = inputId.split('-')[2];
-					var mustBeSelected = selection.indexOf(dataId) >= 0;
-					// if state doesn't match what we want, toggle
+    function processEntry(entry) {
+      entry.isSelected().then(function(selected) {
+        entry.getAttribute('id').then(function(inputId) {
+          // format is "ms0-option-theid", we extract that id
+          var dataId = inputId.split('-')[2];
+          var mustBeSelected = selection.indexOf(dataId) >= 0;
+          // if state doesn't match what we want, toggle
 
-					if (selected !== mustBeSelected) {
-						// need to click on the label, not input
-						entry.element(by.xpath('following-sibling::label')).click();
-						// confirm that the checkbox was set
-						browser.wait(function() {
-							return entry.isSelected().then(function(newSelection) {
-								return newSelection === mustBeSelected;
-							});
-						});
-					}
-				});
-			});
-		}
+          if (selected !== mustBeSelected) {
+            // need to click on the label, not input
+            entry.element(by.xpath('following-sibling::label')).click();
+            // confirm that the checkbox was set
+            browser.wait(function() {
+              return entry.isSelected().then(function(newSelection) {
+                return newSelection === mustBeSelected;
+              });
+            });
+          }
+        });
+      });
+    }
 
-		browser.wait(function() {
-			return dropDownEl.isPresent();
-		}, 1000).then(function() {
-			dropDownEl.all(by.css('[type=checkbox]')).then(function(entries) {
-				for (var i = 0; i < entries.length; i++) {
-					processEntry(entries[i]);
-				}
-				// give it some time to save changes
-				browser.sleep(300).then(function() {
-					d.fulfill(true);
-				});
-			});
-		});
+    browser.wait(function() {
+      return dropDownEl.isPresent();
+    }, 1000).then(function() {
+      dropDownEl.all(by.css('[type=checkbox]')).then(function(entries) {
+        for (var i = 0; i < entries.length; i++) {
+          processEntry(entries[i]);
+        }
+        // give it some time to save changes
+        browser.sleep(300).then(function() {
+          d.fulfill(true);
+        });
+      });
+    });
 
-		return d.promise;
-	};
+    return d.promise;
+  };
   
-  Page.prototype.moveMouseTo = function(locator) {
-    var elem = element(locator);
-    return browser.actions().mouseMove(elem).perform();
+//================ PAGE NAVIGATION =====================================================//
+//======================================================================================//
+
+  Page.isLoggedIn = function() {
+    return this.displayName.isPresent().then(function(isLoggedIn) {
+      return isLoggedIn;
+    });
   }
 
-  Page.prototype.dragAndDrop = function (locator1, locator2) {
+  Page.getAsUser = function(name, pass, url) { 
+    var loginPage;
+
+    if(url === undefined) {
+      url = this.baseUrl;
+    };
+
+    return this.isLoggedIn().then(function(isLoggedIn) {
+      if( ! isLoggedIn) {
+        loginPage = new LoginPage(this.baseUrl);
+
+        loginPage.get();
+        return loginPage.login(name, pass).then(function() {
+          return browser.get(url);
+        });
+      } else {
+        return browser.get(url);
+      };
+    });
+  };
+
+//================ MOUSE ACTIONS =======================================================//
+//======================================================================================//
+
+  Page.moveMouseTo = function(locator) {
+    var elem = element(locator);
+    return browser.actions().mouseMove(elem).perform();
+  };
+
+  Page.dragAndDrop = function (locator1, locator2) {
     this.moveMouseTo(locator1);
     browser.actions().mouseDown().perform();
     this.moveMouseTo(locator2);
     browser.actions().mouseUp().perform();
-  }
+  };
 
 	module.exports = Page;
 })();
