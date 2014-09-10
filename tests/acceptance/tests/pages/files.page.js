@@ -9,7 +9,7 @@
 
     var url = this.url
     this.folderUrl = function(folder) {
-      return url + '/?dir=%2F' + folder
+      return url + '?dir=%2F' + folder
     }
 
     // filelist
@@ -109,6 +109,16 @@
 //================ NAVIGATION ==========================================================//
 //======================================================================================//
 
+  FilesPage.prototype.getAsUser = function(name, pass) { 
+    var Page = require('../helper/page.js')
+
+    Page.getAsUser(name, pass, this.url);
+
+    var button = this.newButton;
+    return browser.wait(function() {
+      return button.isDisplayed();
+    }, 5000, 'load files content');
+  };
 
   FilesPage.prototype.get = function() { 
     browser.get(this.url);
@@ -130,9 +140,7 @@
 
 
   FilesPage.prototype.goInToFolder = function(fileName) {
-    var page = new Page();
-
-    page.moveMouseTo(this.fileListElemId(fileName));
+    Page.moveMouseTo(this.fileListElemId(fileName));
     element(this.fileListElemNameId(fileName)).click();
     var button = this.newButton;
     browser.wait(function() {
@@ -171,16 +179,16 @@
 //======================================================================================//
 
   FilesPage.prototype.openRenameForm = function(fileName) {
-    var page = new Page();
     var renameButton = element(this.renameButtonId(fileName));
 
-    return page.moveMouseTo(this.fileListElemId(fileName)).then(function() {
+    return Page.moveMouseTo(this.fileListElemId(fileName)).then(function() {
       return renameButton.click();
     })
   };
 
   FilesPage.prototype.renameFile = function(fileName, newFileName) {
     var renameForm = element(this.renameFormId(fileName));
+
     return this.openRenameForm(fileName).then(function() {
       for(var i=0; i<5; i++) {
         renameForm.sendKeys(protractor.Key.DELETE)
@@ -192,16 +200,15 @@
   };
 
   FilesPage.prototype.renameFolder = function(fileName, newFileName) {
-    this.renameFile(fileName, newFileName);
+    return this.renameFile(fileName, newFileName);
   };
 
 //================ DELETE ==============================================================//
 //======================================================================================//
 
   FilesPage.prototype.deleteFile = function(fileName) {
-    var page = new Page();
-
-    page.moveMouseTo(this.fileListElemId(fileName));
+    var Page = require('../helper/page.js');
+    Page.moveMouseTo(this.fileListElemId(fileName));
     return element(this.deleteButtonId(fileName)).click();
   };
 
@@ -214,9 +221,7 @@
 
 
   FilesPage.prototype.openShareForm = function(fileName) {
-    var page = new Page();
-
-    page.moveMouseTo(this.fileListElemId(fileName));
+    Page.moveMouseTo(this.fileListElemId(fileName));
     return element(this.shareButtonId(fileName)).click();
   };
 
@@ -279,8 +284,7 @@
 //======================================================================================//
 
   FilesPage.prototype.restoreFile = function(id) {
-    var page = new Page();
-    page.moveMouseTo(this.restoreListElemId(id));
+    Page.moveMouseTo(this.restoreListElemId(id));
     return element(this.restoreButtonId(id)).click();
   };
 
@@ -324,7 +328,7 @@
 
   FilesPage.prototype.createSubFolder = function(folderName, subFolderName) {
     this.goInToFolder(folderName);
-    this.createNewFolder(subFolderName);
+    this.createFolder(subFolderName);
   };
 
 //================ EDIT TXT ============================================================//

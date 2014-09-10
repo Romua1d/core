@@ -9,7 +9,10 @@
  */
 
 /* global protractor, module, element, by, browser */
+
 (function() {
+  var LoginPage = require('../pages/login.page.js');
+  var params = browser.params;
 	var Page = function() {
     this.displayName = element(by.id("expandDisplayName"));
     this.userActionDropdown = element(by.id('expanddiv'));
@@ -98,30 +101,49 @@
 
     return d.promise;
   };
+
+
+//================ LOCATOR FUNCTIONS ===================================================//
+//======================================================================================//
+
+  // topbar
+  Page.displayNameId = function() {
+   return by.id("expandDisplayName");
+  } 
   
+  Page.userActionDropdownId = function() {
+   return by.id('expanddiv');
+  } 
+  
+  Page.settingUsersId = function() {
+   return by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]');
+  } 
+
+  Page.settingPersonalId = function() {
+   return by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/personal"]');
+  } 
+
 //================ PAGE NAVIGATION =====================================================//
 //======================================================================================//
 
   Page.isLoggedIn = function() {
-    return this.displayName.isPresent().then(function(isLoggedIn) {
+    return element(this.displayNameId()).isPresent().then(function(isLoggedIn) {
       return isLoggedIn;
     });
   }
 
   Page.getAsUser = function(name, pass, url) { 
-    var loginPage;
-
-    if(url === undefined) {
-      url = this.baseUrl;
+    if(url == undefined) {
+      url = params.baseUrl;
     };
 
     return this.isLoggedIn().then(function(isLoggedIn) {
       if( ! isLoggedIn) {
-        loginPage = new LoginPage(this.baseUrl);
-
-        loginPage.get();
-        return loginPage.login(name, pass).then(function() {
-          return browser.get(url);
+        var loginPage = new LoginPage(params.baseUrl);
+        return loginPage.get().then(function() {
+          return loginPage.login(name, pass).then(function() {
+            return browser.get(url);
+          });
         });
       } else {
         return browser.get(url);

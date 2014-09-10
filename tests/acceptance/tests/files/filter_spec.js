@@ -1,11 +1,12 @@
+var Page = require('../helper/page.js');
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 var UserPage = require('../pages/user.page.js');
 var ShareApi = require('../pages/share_api.page.js');
 var flow = protractor.promise.controlFlow();
 
-// ============================ FILTER =============================================================== //
-// =================================================================================================== //
+//================ FILTERS =============================================================//
+//======================================================================================//
 
 describe('Filter', function() {
   var params = browser.params;
@@ -22,33 +23,32 @@ describe('Filter', function() {
     shareApi = new ShareApi(params.baseUrl);
   });
 
-  it('should setup', function() {
-    filesPage.getAsUser(params.login.user, params.login.password);
-    userPage.get();
+  it('setup', function() {
+    Page.getAsUser(params.login.user, params.login.password, userPage.url);
     userPage.createNewUser('demo', 'password');
 
     filesPage.get();
 
-    var createFiles = function() {
-      filesPage.createNewFolder('sharedFoler');
-      filesPage.createNewTxtFile('sharedFile');
-      filesPage.createNewTxtFile('sharedFile2');
+    var create = function() {
+      filesPage.createFolder('sharedFoler');
+      filesPage.createTxtFile('sharedFile');
+      filesPage.createTxtFile('sharedFile2');
     };
 
-    var createShares = function() {
+    var share = function() {
       shareApi.create('sharedFoler', 'demo', 0);
       shareApi.create('sharedFile.txt', 'demo', 0);
       shareApi.create('sharedFile2.txt', 'demo', 0);
     };
     
-    flow.execute(createFiles);
-    flow.execute(createShares);
+    flow.execute(create);
+    flow.execute(share);
 
     expect(filesPage.listFiles()).toContain('sharedFoler', 'sharedFile', 'sharedFile2');
     loginPage.logout(); 
   });
 
-  it('should show files shared with others', function() {
+  it('should show files shared with you', function() {
     filesPage.getAsUser('demo', 'password');
     filesPage.filterSharedWhithYou.click();
     browser.wait(function() {
@@ -60,18 +60,21 @@ describe('Filter', function() {
 
   it('should show files shared with others', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-
     filesPage.filterSharedWhithOthers.click();
-
     expect(filesPage.listFiles()).toContain('sharedFoler', 'sharedFile', 'sharedFile2');
   });
 
   it('should show all files', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-
     filesPage.filterAllFiles.click();
-
     expect(filesPage.listFiles()).toContain('music', 'documents', 'photos', 'sharedFoler', 'sharedFile', 'sharedFile2');
   });
 
+  it('clean up', function() {
+    filesPage.getAsUser(params.login.user, params.login.password).then(function() {
+      filesPage.deleteFile('sharedFile.txt');
+      filesPage.deleteFile('sharedFile2.txt');
+      filesPage.deleteFolder('sharedFoler');
+    });
+  });
 });

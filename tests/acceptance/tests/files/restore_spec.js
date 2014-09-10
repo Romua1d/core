@@ -1,4 +1,4 @@
-var Page = require('..(helper/page.js');
+var Page = require('../helper/page.js');
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 var ShareApi = require('../pages/share_api.page.js');
@@ -14,7 +14,7 @@ describe('Restore Folders', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
 
@@ -110,7 +110,7 @@ describe('Restore Files', function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
     shareApi = new ShareApi(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should restore a file thas has been deleted', function() {

@@ -45,6 +45,18 @@
 // ================ ACTIONS ===================================================================== //
 // ============================================================================================== //
 
+  
+  UserPage.prototype.getAsUser = function(name, pass) { 
+    var Page = require('../helper/page.js')
+    var filter = this.userFilter;
+    
+    Page.getAsUser(name, pass, this.url);
+    
+    return browser.wait(function() {
+      return filter.isDisplayed();
+    }, 5000, 'load files content');
+  };
+
   UserPage.prototype.get = function() {
     browser.get(this.url);
   };

@@ -15,7 +15,7 @@
   };
   
   LoginPage.prototype.get = function() {
-    browser.get(this.url);
+    return browser.get(this.url);
   };
   
   LoginPage.prototype.isCurrentPage = function() {
@@ -31,7 +31,7 @@
     this.fillUserCredentilas(user, pass);
     this.loginButton.click();
     var button = this.newButton;
-    browser.wait(function() {
+    return browser.wait(function() {
       return button.isPresent();
     }, 5000, 'load files content');
   };

@@ -13,7 +13,7 @@ describe('Folders', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should create a new folder', function() {
@@ -28,14 +28,14 @@ describe('Folders', function() {
   });
 
   it('should have access to folder', function() {
-    filesPage.get(); // TODO: reload cause warning alerts don't disappear
+    var protrac = protractor.getInstance();
     filesPage.goInToFolder('testFolder');
 
     var expectedUrl = filesPage.folderUrl('testFolder');
     protrac.getCurrentUrl().then(function(url) {
       expect(expectedUrl).toEqual(url);
+      filesPage.get();
     });
-    filesPage.get();
   });
 
   it('should delete a folder', function() {
@@ -58,7 +58,7 @@ describe('Subfolders', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
 
