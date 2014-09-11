@@ -1,3 +1,24 @@
+/**
+* ownCloud
+*
+* @author Sebastian Elpelt
+* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+* License as published by the Free Software Foundation; either
+* version 3 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+*
+* You should have received a copy of the GNU Affero General Public
+* License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 var Page = require('../helper/page.js');
 var FilesPage = require('../pages/files.page.js');
 var UserPage = require('../pages/user.page.js');
@@ -16,9 +37,36 @@ describe('Users', function() {
   });
 
   it('should access settings > users ', function() {
+    // TODO: find a locatorfunction for Page.userActionDropdown.isDisplayed()
+    // Page.displayName.click();
+    // browser.wait(function() {
+    //   return page.userActionDropdown.isDisplayed();
+    // })
+    // page.settingUsers.click();
+
     protrac.getCurrentUrl().then(function(url) {
       expect(userPage.url).toEqual(url);
     });
+  });
+
+  it('should login as admin and create a new user ', function() {
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.createNewUser('demo', 'demo');
+    userPage.get();
+    expect(userPage.listUser()).toContain('demo');
+    loginPage.logout();
+  });
+  
+  it('should login with a new user', function() {    
+    filesPage.getAsUser('demo', 'demo');
+    expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
+  });
+  
+  it('should login as admin and delete new user', function() {    
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.deleteUser('demo');
+    userPage.get();
+    expect(userPage.listUser()).not.toContain('demo');
   });
 
   it('should create 15 users with password', function() {
@@ -66,7 +114,7 @@ describe('Users', function() {
     userPage.renameDisplayName('demo03', 'Petra Pan');
 
     userPage.get();
-    page.displayName.getText().then(function(displayName) {
+    element(Page.displayNameId()).getText().then(function(displayName) {
       expect(displayName).toEqual('Manfred Mustermann');
     })
   });

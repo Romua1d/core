@@ -1,3 +1,24 @@
+/**
+* ownCloud
+*
+* @author Sebastian Elpelt
+* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+* License as published by the Free Software Foundation; either
+* version 3 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+*
+* You should have received a copy of the GNU Affero General Public
+* License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 var Page = require('../helper/page.js')
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
@@ -36,7 +57,7 @@ describe('Txt Files', function() {
     expect(filesPage.listFiles()).not.toContain('testText')
   });
 
-  iit('should delete a shared file only form user', function() {
+  it('should delete a shared file only form user', function() {
     var userPage = new UserPage(params.baseUrl);
     userPage.getAsUser(params.login.user, params.login.password);
     userPage.createNewUser('demo', 'password');

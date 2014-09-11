@@ -115,13 +115,13 @@
    return by.id('expanddiv');
   } 
   
-  Page.settingUsersId = function() {
-   return by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/users"]');
-  } 
+  // Page.settingUsersId = function() {
+  //  return by.css("a[href='" +  params.baseUrl + "settings/users']");
+  // } 
 
-  Page.settingPersonalId = function() {
-   return by.css('a[href="/ownclouds/owncloud-community-7.0.2/index.php/settings/personal"]');
-  } 
+  // Page.settingPersonalId = function() {
+  //  return by.css("a[href='" +  params.baseUrl + "settings/personal']");
+  // } 
 
 //================ PAGE NAVIGATION =====================================================//
 //======================================================================================//
@@ -156,7 +156,10 @@
 
   Page.moveMouseTo = function(locator) {
     var elem = element(locator);
-    return browser.actions().mouseMove(elem).perform();
+    browser.actions().mouseMove(elem).perform();
+    return browser.wait(function() {
+      return element(by.css('td:hover')).isDisplayed();
+    });
   };
 
   Page.dragAndDrop = function (locator1, locator2) {

@@ -1,3 +1,24 @@
+/**
+* ownCloud
+*
+* @author Sebastian Elpelt
+* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+* License as published by the Free Software Foundation; either
+* version 3 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+*
+* You should have received a copy of the GNU Affero General Public
+* License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 var Page = require('../helper/page.js');
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
@@ -48,7 +69,7 @@ describe('Restore Folders', function() {
     filesPage.deleteFolder('Sp€c!@l FölD€r');
   });
 
-  it('should restore a non empty folder that has been deleted', function() {
+it('should restore a non empty folder that has been deleted', function() {
     filesPage.createFolder('nonEmpty');
     filesPage.createSubFolder('nonEmpty', 'Subfolder');
     filesPage.createTxtFile('TextFile');
@@ -93,9 +114,8 @@ describe('Restore Folders', function() {
     }, 3000);
     filesPage.restoreFolder(1);
     filesPage.get();
-    expect(filesPage.listFiles()).toContain('Subfolder').then(function() {
-      filesPage.deleteFolder('Subfolder');
-    });
+    expect(filesPage.listFiles()).toContain('Subfolder');
+    filesPage.deleteFolder('Subfolder');
   });
 });
 

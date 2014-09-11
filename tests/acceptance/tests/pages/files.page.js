@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2014
+ *
+ * This file is licensed under the Affero General Public License version 3
+ * or later.
+ *
+ * See the COPYING-README file.
+ *
+ */
+
+/* global module, protractor, element, by, browser, require */
 (function() {  
   var Page = require('../helper/page.js');
   var LoginPage = require('../pages/login.page.js');
@@ -12,6 +23,9 @@
       return url + '?dir=%2F' + folder
     }
 
+//================ ELEMENTS ============================================================//
+//======================================================================================//
+
     // filelist
     this.selectedFileListId = by.css('tr.searchresult td.filename .innernametext');
     this.firstListElem = element(by.css('#fileList tr:first-child'));
@@ -23,8 +37,10 @@
     this.newTextnameForm = element(by.css('li.icon-filetype-text form input'));
     this.newFoldernameForm = element(by.css('li.icon-filetype-folder form input'));
 
+    // alert
     this.alertWarning = element(by.css('.tipsy-inner'));
 
+    // trashbin
     this.trashbinButton = element(by.css('#app-navigation li.nav-trashbin a'));
 
     // sort arrows
@@ -109,16 +125,28 @@
 //================ NAVIGATION ==========================================================//
 //======================================================================================//
 
-  FilesPage.prototype.getAsUser = function(name, pass) { 
+  /**
+  * logs in as User and loads filespage.
+  *
+  * @param {String} userName username
+  * @param {String} pass user's password
+  */
+
+  FilesPage.prototype.getAsUser = function(userName, pass) { 
     var Page = require('../helper/page.js')
 
-    Page.getAsUser(name, pass, this.url);
+    // general function
+    Page.getAsUser(userName, pass, this.url);
 
     var button = this.newButton;
     return browser.wait(function() {
       return button.isDisplayed();
     }, 5000, 'load files content');
   };
+
+  /**
+  * loads the filespage.
+  */
 
   FilesPage.prototype.get = function() { 
     browser.get(this.url);
@@ -129,8 +157,14 @@
     }, 5000, 'load files content');
   };
 
-  FilesPage.prototype.getFolder = function(folder) {
-    folderUrl = this.folderUrl(folder);
+  /**
+  * loads folder content via url
+  *
+  * @param {String} folderName foldername
+  */
+
+  FilesPage.prototype.getFolder = function(folderName) {
+    folderUrl = this.folderUrl(folderName);
     browser.get(folderUrl);
     var button = this.newButton;
     browser.wait(function() {
@@ -138,18 +172,30 @@
     }, 5000, 'load files content');
   };
 
+  /**
+  * loads folder contet via hover and click
+  *
+  * @param {String} folderName foldername
+  */
 
-  FilesPage.prototype.goInToFolder = function(fileName) {
-    Page.moveMouseTo(this.fileListElemId(fileName));
-    element(this.fileListElemNameId(fileName)).click();
+  FilesPage.prototype.goInToFolder = function(folderName) {
+    Page.moveMouseTo(this.fileListElemId(folderName));
+    element(this.fileListElemNameId(folderName)).click();
     var button = this.newButton;
     browser.wait(function() {
       return button.isDisplayed();
     }, 5000, 'load files content');
   };
 
-  FilesPage.prototype.getSubFolder = function(folder, subFolder) {
-    folderUrl = this.folderUrl(folder) + '%2F' + subFolder;
+  /**
+  * loads subfolder content via url from root
+  *
+  * @param {String} folderName folder subfolder is in
+  * @param {String} subFolderName folder you want go to
+  */
+
+  FilesPage.prototype.getSubFolder = function(folderName, subFolderName) {
+    folderUrl = this.folderUrl(folderName) + '%2F' + subFolderName;
     browser.get(folderUrl);
     var button = this.newButton;
     browser.wait(function() {
@@ -160,6 +206,10 @@
 //================ FILELIST ============================================================//
 //======================================================================================//
 
+  /**
+  * returns an array of foldernames and filenames without subfixes
+  */
+
   FilesPage.prototype.listFiles = function() {
     // TODO: waiting to avoid "index out of bound error" 
     browser.sleep(800);
@@ -167,6 +217,10 @@
       return filename.getText();
     });
   };
+
+  /**
+  * lists all selected files and folders, returns an array of names without subfixes
+  */
 
   FilesPage.prototype.listSelctedFiles = function() {
     return element.all(this.selectedFileListId).map(function(filename) {
@@ -177,6 +231,12 @@
 //================ RENAMING ============================================================//
 //======================================================================================//
 
+  /**
+  * opens file's renamingform, used in renameFile function
+  *
+  * @param {String} filerName filename
+  */
+
   FilesPage.prototype.openRenameForm = function(fileName) {
     var renameButton = element(this.renameButtonId(fileName));
 
@@ -184,6 +244,13 @@
       return renameButton.click();
     })
   };
+
+  /**
+  * renames a file
+  *
+  * @param {String} fileName filename
+  * @param {String} newFilerName new filename
+  */
 
   FilesPage.prototype.renameFile = function(fileName, newFileName) {
     var renameForm = element(this.renameFormId(fileName));
@@ -198,18 +265,39 @@
     });
   };
 
-  FilesPage.prototype.renameFolder = function(fileName, newFileName) {
-    return this.renameFile(fileName, newFileName);
+  /**
+  * renames a folder
+  *
+  * @param {String} folderName foldername
+  * @param {String} newFolderrName new foldername
+  */
+
+  FilesPage.prototype.renameFolder = function(folderName, newFolderName) {
+    return this.renameFile(folderName, newFolderName);
   };
 
 //================ DELETE ==============================================================//
 //======================================================================================//
+  
+  /**
+  * deletes a file
+  *
+  * @param {String} fileName filename
+  * @param {String} newFilerName new filename
+  */
 
   FilesPage.prototype.deleteFile = function(fileName) {
     var Page = require('../helper/page.js');
     Page.moveMouseTo(this.fileListElemId(fileName));
     return element(this.deleteButtonId(fileName)).click();
   };
+
+  /**
+  * deletes a folder
+  *
+  * @param {String} folderName foldername
+  * @param {String} newFolderrName new foldername
+  */
 
   FilesPage.prototype.deleteFolder = function(folderName) {
     return this.deleteFile(folderName);
@@ -219,10 +307,23 @@
 //======================================================================================//
 
 
+  /**
+  * opens file's sharingform, used in shareFile function
+  *
+  * @param {String} filerName filename or foldername
+  */
+  
   FilesPage.prototype.openShareForm = function(fileName) {
     Page.moveMouseTo(this.fileListElemId(fileName));
     return element(this.shareButtonId(fileName)).click();
   };
+  
+  /**
+  * shares a file
+  *
+  * @param {String} fileName filename
+  * @param {String} username user file is shared with
+  */
 
   FilesPage.prototype.shareFile = function(fileName, userName) {
     this.openShareForm(fileName);
@@ -233,10 +334,24 @@
     }, 3000);
     this.shareWithForm.sendKeys(protractor.Key.ENTER);
   }
+  
+  /**
+  * shares a folder
+  *
+  * @param {String} folderName foldername
+  * @param {String} username user folder is shared with
+  */
 
   FilesPage.prototype.shareFolder = function(folderName, userName) {
     this.shareFile(folderName);
   }
+  
+  /**
+  * disables reshare option
+  *
+  * @param {String} fileName filename or foldername
+  * @param {String} username user who can't reshare the file or folder anymore
+  */
 
   FilesPage.prototype.disableReshare = function(fileName, userName) {
     var disableReshareButton = element(this.disableReshareButtonId(fileName));
@@ -254,6 +369,12 @@
     disableReshareButton.click();
   };
 
+  /**
+  * checks if user ether can or can't reshare a file or folder
+  *
+  * @param {String} fileName filename or foldername
+  */
+
   FilesPage.prototype.checkReshareability = function(fileName) {
     var page = new Page();
     var shareButtonLocator = this.shareButtonId(fileName);
@@ -262,6 +383,13 @@
       return element(shareButtonLocator).isPresent();
     });
   };
+  
+  /**
+  * disables edit option
+  *
+  * @param {String} fileName filename or foldername
+  * @param {String} username user who can't edit the file or folder anymore
+  */
 
   FilesPage.prototype.disableEdit = function(fileName, userName) {
     var disableEditButton = element(this.disableEditButtonId(userName));
@@ -278,14 +406,31 @@
     disableEditButton.click();
   };
 
-
 //================ RESTORE =============================================================//
 //======================================================================================//
 
+  /**
+  * restores a file
+  *
+  * @param {Integer} [id] list element id, default is the first element, so the last that has be deleted
+  */
+
   FilesPage.prototype.restoreFile = function(id) {
+
+    // set default id 
+    if(! id) {
+      id = 0;
+    }
+
     Page.moveMouseTo(this.restoreListElemId(id));
     return element(this.restoreButtonId(id)).click();
   };
+
+  /**
+  * restores a folder
+  *
+  * @param {Integer} [id] list element id, default is the first element, so the last that has be deleted
+  */
 
   FilesPage.prototype.restoreFolder = function(id) {
     this.restoreFile(id);
@@ -294,10 +439,16 @@
 //================ CREATE ==============================================================//
 //======================================================================================//
 
-  FilesPage.prototype.createTxtFile = function(name) {
+  /**
+  * creates a .txt file
+  *
+  * @param {String} fileName filename with subfix (.txt) // example: "filename.txt"
+  */
+
+  FilesPage.prototype.createTxtFile = function(fileName) {
     this.newButton.click();
     this.newTextButton.click();
-    this.newTextnameForm.sendKeys(name); 
+    this.newTextnameForm.sendKeys(fileName); 
     this.newTextnameForm.sendKeys(protractor.Key.ENTER);
     
     // TODO: find correct wait trigger
@@ -309,10 +460,16 @@
     browser.sleep(800);
   };
 
-  FilesPage.prototype.createFolder = function(name) {
+  /**
+  * creates a folder
+  *
+  * @param {String} folderName foldername
+  */
+
+  FilesPage.prototype.createFolder = function(folderName) {
     this.newButton.click()
     this.newFolderButton.click();
-    this.newFoldernameForm.sendKeys(name); 
+    this.newFoldernameForm.sendKeys(folderName); 
     this.newFoldernameForm.sendKeys(protractor.Key.ENTER);
 
     // TODO: find correct wait trigger
@@ -324,6 +481,12 @@
     browser.sleep(800);
   };
 
+  /**
+  * creates a subfolder from root
+  *
+  * @param {String} folderName folder subfolder will be in
+  * @param {String} subFolderName folder wich will be created
+  */
 
   FilesPage.prototype.createSubFolder = function(folderName, subFolderName) {
     this.goInToFolder(folderName);
@@ -333,26 +496,53 @@
 //================ EDIT TXT ============================================================//
 //======================================================================================//
 
+  /**
+  * opens a file, used in editTxtFile function
+  *
+  * @param {String} fileName filename with subfix (.txt)
+  */
+
   FilesPage.prototype.openFile = function(fileName) {
     element(this.fileListElemNameId(fileName)).click();
     browser.sleep(800);
   };
+
+  /**
+  * writes in a .txt file, used in editTxtFile function
+  *
+  * @param {String} text text written in .txt file
+  */
 
   FilesPage.prototype.writeInFile = function(text) {
     var textArea = element(this.textAreaId);
     textArea.sendKeys(text);
   };
 
+  /**
+  * saves a .txt file, used in editTxtFile function
+  */
+
   FilesPage.prototype.saveFile = function() {
     saveButton = element(this.saveButtonId);
     saveButton.click();
   };
 
+  /**
+  * edits a .txt file
+  *
+  * @param {String} fileName filename with subfix (.txt)
+  * @param {String} text text written in .txt file
+  */
+
   FilesPage.prototype.editTxtFile = function(fileName, text) {
     this.openFile(fileName);
     this.writeInFile(text);
     this.saveFile();
-  },
+  };
+
+  /**
+  * returns text written in a .txt file
+  */
 
   FilesPage.prototype.getTextContent = function() {
     return element(this.textLineId).getText().then( function(text) {

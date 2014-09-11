@@ -1,3 +1,24 @@
+/**
+* ownCloud
+*
+* @author Sebastian Elpelt
+* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+* License as published by the Free Software Foundation; either
+* version 3 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+*
+* You should have received a copy of the GNU Affero General Public
+* License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 var Page = require('../helper/page.js')
 var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
@@ -63,15 +84,15 @@ describe('Subfolders', function() {
 
 
   it('should go into folder and create subfolder', function() {
-    var folder = 'hasSubFolder';
-    filesPage.createFolder(folder);
-    filesPage.getFolder(folder);
+    filesPage.createFolder('hasSubFolder');
+    filesPage.getFolder('hasSubFolder');
     filesPage.createFolder('SubFolder');
     filesPage.createFolder('SubFolder2');
     expect(filesPage.listFiles()).toContain('SubFolder', 'SubFolder2');
   });  
 
   it('should rename a subfolder', function() {
+    filesPage.getFolder('hasSubFolder');
     filesPage.renameFolder('SubFolder2', 'NewSubFolder');
     browser.wait(function() {
       return(filesPage.listFiles());
@@ -80,16 +101,13 @@ describe('Subfolders', function() {
   });
 
   it('should delete a subfolder', function() {
+    filesPage.getFolder('hasSubFolder');
     filesPage.deleteFolder('SubFolder').then(function() {
       expect(filesPage.listFiles()).not.toContain('SubFolder');
     });
   });
 
   it('should delete a folder containing a subfolder', function() {
-    filesPage.get();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
     filesPage.deleteFolder('hasSubFolder').then(function() {
       expect(filesPage.listFiles()).not.toContain('hasSubFolder');
     });

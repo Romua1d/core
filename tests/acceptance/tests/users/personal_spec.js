@@ -1,3 +1,24 @@
+/**
+* ownCloud
+*
+* @author Sebastian Elpelt
+* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
+* License as published by the Free Software Foundation; either
+* version 3 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU AFFERO GENERAL PUBLIC LICENSE for more details.
+*
+* You should have received a copy of the GNU Affero General Public
+* License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+
 var Page = require('../helper/page.js');
 var UserPage = require('../pages/user.page.js');
 var LoginPage = require('../pages/login.page.js');
@@ -7,7 +28,6 @@ var protrac = protractor.getInstance();
 
 describe('Personal', function() {
   var params = browser.params;
-  var page;
   var userPage;
   var loginPage;
   var filesPage;
@@ -15,7 +35,6 @@ describe('Personal', function() {
 
   beforeEach(function() {
     isAngularSite(false);
-    page = new Page();
     filesPage = new FilesPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     loginPage = new LoginPage(params.baseUrl);
@@ -23,21 +42,23 @@ describe('Personal', function() {
   });
 
   it('setup',function() {
-    filesPage.getAsUser(params.login.user, params.login.password);
-    userPage.get();
-    userPage.createNewUser('demo01', 'pass');
-    browser.sleep(500);
-    expect(userPage.listUser()).toContain('demo01');
-    loginPage.logout();
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.createNewUser('demo1', 'pass').then(function() {
+      browser.sleep(500);
+      expect(userPage.listUser()).toContain('demo1');
+      loginPage.logout();  
+    });
   });
 
   it('should have access to personal page', function() {
-    filesPage.getAsUser('demo01', 'pass');
-    page.displayName.click();
-    browser.wait(function() {
-      return page.userActionDropdown.isDisplayed();
-    })
-    page.settingPersonal.click();
+    personalPage.getAsUser('demo1', 'pass');
+    // TODO: find a Locatorfunction for Page.userActionDropdownId() 
+    // element(Page.displayNameId()).click();
+    // browser.wait(function() {
+    //   console.log()
+    //   return element(Page.userActionDropdownId()).isDisplayed();
+    // }, 3000, 'open dropdown');
+    // element(Page.settingPersonalId()).click();
 
     protrac.getCurrentUrl().then(function(url) {
       expect(personalPage.url).toEqual(url);
@@ -46,36 +67,31 @@ describe('Personal', function() {
   });
 
   it('should change a user password in the personal page', function() {
-    filesPage.getAsUser('demo01', 'pass');
-    personalPage.get();
+    personalPage.getAsUser('demo1', 'pass');
     personalPage.changePassword('pass', 'password')
 
     loginPage.logout();
-    loginPage.login('demo01', 'password');
-    page.displayName.getText().then(function(displayName) {
-      expect(displayName).toEqual('demo01');
+    loginPage.login('demo1', 'password');
+    element(Page.displayNameId()).getText().then(function(displayName) {
+      expect(displayName).toEqual('demo1');
     })
   });
 
-  iit('should change display name', function() {
-    filesPage.getAsUser('demo01', 'password');
-    personalPage.get();
+  it('should change display name', function() {
+    personalPage.getAsUser('demo1', 'password');
     personalPage.changeDisplayName('Sam Sample');
     personalPage.get();
-    
 
-    page.displayName.getText().then(function(displayName) {
+    element(Page.displayNameId()).getText().then(function(displayName) {
       expect(displayName).toEqual('Sam Sample');
     })
   });
 
   it('clean up',function() {
     loginPage.logout();
-    filesPage.getAsUser(params.login.user, params.login.password);
-    userPage.get();
-    userPage.deleteUser('demo01');
-    userPage.get();
-    expect(userPage.listUser()).not.toContain('demo01');
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.deleteUser('demo1');
+    expect(userPage.listUser()).not.toContain('demo1');
   });
 
 });
