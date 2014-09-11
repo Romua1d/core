@@ -104,7 +104,13 @@ if($source) {
 		exit();
 	}
 
-	$ctx = stream_context_create(null, array('notification' =>'progress'));
+	$contextArray = array(
+		'http' => array(
+			'follow_location' => false, // Do not follow the location since we can't limit the protocol
+		),
+	);
+	$ctx = stream_context_create($contextArray, array('notification' =>'progress'));
+
 	$sourceStream=@fopen($source, 'rb', false, $ctx);
 	$result = 0;
 	if (is_resource($sourceStream)) {

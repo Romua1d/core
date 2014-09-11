@@ -1239,6 +1239,8 @@ class OC_Util {
 			throw new Exception('$url must start with https:// or http://', 1);
 		}
 
+		$proxy = \OC::$server->getConfig()->getSystemValue('proxy', null);
+		$proxyUserPwd = \OC::$server->getConfig()->getSystemValue('proxyuserpwd', null);
 		if (function_exists('curl_init')) {
 			$curl = curl_init();
 			$max_redirects = 10;
@@ -1247,17 +1249,18 @@ class OC_Util {
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
 			curl_setopt($curl, CURLOPT_URL, $url);
-
+			curl_setopt($curl, CURLOPT_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
+			curl_setopt($curl, CURLOPT_REDIR_PROTOCOLS,  CURLPROTO_HTTP | CURLPROTO_HTTPS);
 
 			curl_setopt($curl, CURLOPT_USERAGENT, self::USER_AGENT);
-			if (OC_Config::getValue('proxy', '') != '') {
-				curl_setopt($curl, CURLOPT_PROXY, OC_Config::getValue('proxy'));
+			if ($proxy !== null) {
+				curl_setopt($curl, CURLOPT_PROXY, $proxy);
 			}
-			if (OC_Config::getValue('proxyuserpwd', '') != '') {
-				curl_setopt($curl, CURLOPT_PROXYUSERPWD, OC_Config::getValue('proxyuserpwd'));
+			if ($proxyUserPwd !== null) {
+				curl_setopt($curl, CURLOPT_PROXYUSERPWD, $proxyUserPwd);
 			}
 
-			if (ini_get('open_basedir') === '' && ini_get('safe_mode') === 'Off') {
+			if (ini_get('open_basedir') === '' && (ini_get('safe_mode') === false) || strtolower(ini_get('safe_mode')) === 'off') {
 				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 				curl_setopt($curl, CURLOPT_MAXREDIRS, $max_redirects);
 				$data = curl_exec($curl);
@@ -1301,23 +1304,19 @@ class OC_Util {
 			}
 			curl_close($curl);
 		} else {
-			$contextArray = null;
+			$contextArray = array(
+				'http' => array(
+					'header' => 'User-Agent: ' . self::USER_AGENT . "\r\n",
+					'timeout' => 10,
+					'follow_location' => false, // Do not follow the location since we can't limit the protocol
+				),
+				'ssl' => array(
+					'disable_compression' => true
+				)
+			);
 
-			if (OC_Config::getValue('proxy', '') != '') {
-				$contextArray = array(
-					'http' => array(
-						'header' => 'User-Agent: ' . self::USER_AGENT . "\r\n",
-						'timeout' => 10,
-						'proxy' => OC_Config::getValue('proxy')
-					)
-				);
-			} else {
-				$contextArray = array(
-					'http' => array(
-						'header' => 'User-Agent: ' . self::USER_AGENT . "\r\n",
-						'timeout' => 10
-					)
-				);
+			if ($proxy !== null) {
+				$contextArray['http']['proxy'] = $proxy;
 			}
 
 			$ctx = stream_context_create(
