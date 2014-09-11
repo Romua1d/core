@@ -93,7 +93,9 @@ describe('Restore Folders', function() {
     }, 3000);
     filesPage.restoreFolder(1);
     filesPage.get();
-    expect(filesPage.listFiles()).toContain('Subfolder');
+    expect(filesPage.listFiles()).toContain('Subfolder').then(function() {
+      filesPage.deleteFolder('Subfolder');
+    });
   });
 });
 

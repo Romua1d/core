@@ -11,7 +11,7 @@ describe('Sort', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should sort files by name', function() {
@@ -28,7 +28,7 @@ describe('Sort', function() {
 
   it('should sort files by modified date', function() {
     expect(filesPage.firstListElem == element(filesPage.fileListElemId("documents"))).toBeTruthy;
-    filesPage.createNewTxtFile('newText')
+    filesPage.createTxtFile('newText');
     filesPage.modifiedSortArrow.click();
     expect(filesPage.firstListElem == element(filesPage.fileListElemId("newText.txt"))).toBeTruthy;
   });

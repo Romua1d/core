@@ -12,7 +12,7 @@ describe('Search', function() {
   beforeEach(function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
-    Page.getAsUser(params.login.user, params.login.password);
+    filesPage.getAsUser(params.login.user, params.login.password);
   });
 
   it('should search files by name', function() {

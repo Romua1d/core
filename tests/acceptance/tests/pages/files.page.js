@@ -150,7 +150,6 @@
 
   FilesPage.prototype.getSubFolder = function(folder, subFolder) {
     folderUrl = this.folderUrl(folder) + '%2F' + subFolder;
-    console.log(folderUrl);
     browser.get(folderUrl);
     var button = this.newButton;
     browser.wait(function() {
