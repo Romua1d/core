@@ -51,7 +51,7 @@
 //======================================================================================//
   
   /**
-  * fills out admin acount, used in login function
+  * fills out lgin form
   *
   * @param {String} userName username
   * @param {String} pass user's password

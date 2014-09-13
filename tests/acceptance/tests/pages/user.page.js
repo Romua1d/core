@@ -107,7 +107,6 @@
   */
 
   UserPage.prototype.fillNewUserInput = function(userName, pass) {
-    this.ensureUserPage();
     this.newUserNameInput.sendKeys(userName);
     browser.sleep(100);
     return this.newUserPasswordInput.sendKeys(pass);
@@ -147,10 +146,10 @@
 // ============================================================================================== //
     
   /**
-  * deletes a user
+  * change users password
   *
   * @param {String} userName username
-  * @param {String} pass user's password
+  * @param {String} pass user's new password
   */
 
   UserPage.prototype.changeUserPass = function(userName, pass) {
@@ -193,7 +192,6 @@
   */
 
   UserPage.prototype.listUser = function() {
-    this.ensureUserPage();
     return element.all(by.css('td.displayName')).map(function(user) {
       return user.getText();
     });
