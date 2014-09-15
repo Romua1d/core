@@ -10,7 +10,6 @@
 
 var Page = require('../helper/page.js');
 var UserPage = require('../pages/user.page.js');
-var LoginPage = require('../pages/login.page.js');
 var FilesPage = require('../pages/files.page.js');
 var PersonalPage = require('../pages/personal.page.js');
 var protrac = protractor.getInstance();
@@ -18,7 +17,6 @@ var protrac = protractor.getInstance();
 describe('Personal', function() {
   var params = browser.params;
   var userPage;
-  var loginPage;
   var filesPage;
   var personalPage;
 
@@ -26,7 +24,6 @@ describe('Personal', function() {
     isAngularSite(false);
     filesPage = new FilesPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
-    loginPage = new LoginPage(params.baseUrl);
     personalPage = new PersonalPage(params.baseUrl);
   });
 
@@ -35,20 +32,11 @@ describe('Personal', function() {
     userPage.createNewUser('demo1', 'pass').then(function() {
       browser.sleep(500);
       expect(userPage.listUser()).toContain('demo1');
-      loginPage.logout();  
     });
   });
 
   it('should have access to personal page', function() {
     personalPage.getAsUser('demo1', 'pass');
-    // TODO: find a Locatorfunction for Page.userActionDropdownId() 
-    // element(Page.displayNameId()).click();
-    // browser.wait(function() {
-    //   console.log()
-    //   return element(Page.userActionDropdownId()).isDisplayed();
-    // }, 3000, 'open dropdown');
-    // element(Page.settingPersonalId()).click();
-
     protrac.getCurrentUrl().then(function(url) {
       expect(personalPage.url).toEqual(url);
     });
@@ -59,8 +47,7 @@ describe('Personal', function() {
     personalPage.getAsUser('demo1', 'pass');
     personalPage.changePassword('pass', 'password')
 
-    loginPage.logout();
-    loginPage.login('demo1', 'password');
+    filesPage.getAsUser('demo1', 'password');
     element(Page.displayNameId()).getText().then(function(displayName) {
       expect(displayName).toEqual('demo1');
     })
@@ -77,10 +64,9 @@ describe('Personal', function() {
   });
 
   it('clean up',function() {
-    loginPage.logout();
     userPage.getAsUser(params.login.user, params.login.password);
     userPage.deleteUser('demo1');
+    userPage.get();
     expect(userPage.listUser()).not.toContain('demo1');
   });
-
 });

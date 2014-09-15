@@ -8,7 +8,6 @@
  *
  */
 
-var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var FilesPage = require('../pages/files.page.js');
 var AdminPage = require('../pages/admin.page.js');
@@ -18,12 +17,11 @@ var ShareApi = require('../pages/share_api.page.js');
 var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
-//================ CREATE  SHARES ======================================================//
+//================ CREATE SHARES =======================================================//
 //======================================================================================//
 
 describe('Create shares', function() {
   var params = browser.params;
-  var loginPage;
   var userPage;
   var filesPage;
   var adminPage;
@@ -31,7 +29,6 @@ describe('Create shares', function() {
 
   beforeEach(function() {
     isAngularSite(false);
-    loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
@@ -65,10 +62,8 @@ describe('Create shares', function() {
     browser.sleep(500);
     filesPage.shareFile('toShare_1', 'demo');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     expect(filesPage.listFiles()).toContain('toShare_1');
-    loginPage.logout();
   });
 
   it('should share a folder including special characters', function() {
@@ -77,10 +72,8 @@ describe('Create shares', function() {
     browser.sleep(500);
     filesPage.shareFile('sP€c!@L', 'demo');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     expect(filesPage.listFiles()).toContain('sP€c!@L');
-    loginPage.logout();
   });
 
   it('should share a folder with 3 another user by display name', function() {
@@ -103,15 +96,12 @@ describe('Create shares', function() {
     }, 3000);
     filesPage.shareWithForm.sendKeys(protractor.Key.ENTER);
 
-    loginPage.logout();
     filesPage.getAsUser('demo4', 'password');
     expect(filesPage.listFiles()).toContain('toShare_2');
 
-    loginPage.logout();
     filesPage.getAsUser('demo3', 'password');
     expect(filesPage.listFiles()).toContain('toShare_2');
 
-    loginPage.logout();
     filesPage.getAsUser('demo2', 'password');
     expect(filesPage.listFiles()).toContain('toShare_2');
   });
@@ -134,12 +124,10 @@ describe('Create shares', function() {
     //share file
     filesPage.shareFile('inSharedBySecond.txt', 'demo');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     filesPage.renameFile('inSharedBySecond.txt', 'renamedBySecond.txt')
     expect(filesPage.listFiles()).toContain('renamedBySecond');
     filesPage.deleteFile('renamedBySecond.txt');
-    loginPage.logout()
   });
 
   it('clean up', function() {
@@ -163,7 +151,6 @@ describe('Create shares', function() {
 
 describe('Delete shared files and folders', function() {
   var params = browser.params;
-  var loginPage;
   var userPage;
   var filesPage;
   var adminPage;
@@ -171,7 +158,6 @@ describe('Delete shared files and folders', function() {
 
   beforeEach(function() {
     isAngularSite(false);
-    loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
@@ -279,7 +265,6 @@ describe('Delete shared files and folders', function() {
 
 describe('Share options', function() {
   var params = browser.params;
-  var loginPage;
   var userPage;
   var filesPage;
   var adminPage;
@@ -287,7 +272,6 @@ describe('Share options', function() {
 
   beforeEach(function() {
     isAngularSite(false);
-    loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
@@ -307,7 +291,6 @@ describe('Share options', function() {
     filesPage.shareFile('noReshare', 'demo');
     filesPage.disableReshare('noReshare', 'demo');
   
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
 
     expect(filesPage.checkReshareability('noReshare')).toBeFalsy();
@@ -328,7 +311,6 @@ describe('Share options', function() {
     filesPage.disableEdit('noEdits.txt', 'demo');
     filesPage.editTxtFile('noEdits.txt', 'No Edits by User!');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     filesPage.openFile('noEdits.txt');
     expect(element(filesPage.saveButtonId).toBeDisplayed).toBeFalsy();
@@ -474,7 +456,6 @@ describe('Share options', function() {
 
     flow.execute(createFolder);
     flow.execute(createShare);
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     filesPage.getSubFolder('sharedFolder4', 'subFolder');
 
@@ -505,9 +486,8 @@ describe('Share options', function() {
 //================ ADMIN CONFIGS SHARE =================================================//
 //======================================================================================//
 
-describe('Admin configs Share', function() {
+ddescribe('Admin configs Share', function() {
   var params = browser.params;
-  var loginPage;
   var userPage
   var filesPage;
   var adminPage;
@@ -515,7 +495,6 @@ describe('Admin configs Share', function() {
 
   beforeEach(function() {
     isAngularSite(false);
-    loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
     adminPage = new AdminPage(params.baseUrl);
@@ -608,11 +587,13 @@ describe('Admin configs Share', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.deleteFile('disabledReshare.txt');
     filesPage.deleteFile('enforceLinkPass.txt');
+    filesPage.deleteFile('noSharesAtAll.txt');
+    filesPage.get();
     expect(filesPage.listFiles()).not.toContain('noReshare');
 
     userPage.get();
     userPage.deleteUser('demo');
-    userPage.get(); // delete last user 
+    userPage.get(); // nessesary to delete last user 
     expect(userPage.listUser()).not.toContain('demo');
   });
 });

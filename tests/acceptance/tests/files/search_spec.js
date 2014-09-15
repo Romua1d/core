@@ -25,13 +25,22 @@ describe('Search', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
   });
 
-  it('should search files by name', function() {
+  it('setup', function() {
     filesPage.createTxtFile('searchFile');
     filesPage.createFolder('searchFolder');
+
+    expect(filesPage.listFiles()).toContain('searchFile', 'searchFolder');
+  });
+
+  it('should search files by name', function() {
     filesPage.searchInput.click();
     filesPage.searchInput.sendKeys('search');
     expect(filesPage.listSelctedFiles()).toContain('searchFile', 'searchFolder');
+  });
+  
+  it('clean up', function() {
     filesPage.deleteFile('searchFile.txt');
     filesPage.deleteFolder('searchFolder');
+    expect(filesPage.listFiles()).not.toContain('searchFile', 'searchFolder');
   });
 });

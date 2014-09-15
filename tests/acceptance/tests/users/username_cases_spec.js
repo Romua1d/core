@@ -8,19 +8,19 @@
  *
  */
 
-var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
+var FilesPage = require('../pages/files.page.js');
 
-describe('Username Cases', function() {
+ddescribe('Username Cases', function() {
   var params = browser.params;
-  var loginPage;
+  var userPage;
+  var filesPage;
   
   beforeEach(function() {
     isAngularSite(false);
-    loginPage = new LoginPage(params.baseUrl);
     userPage = new UserPage(params.baseUrl);
+    filesPage = new FilesPage(params.baseUrl);
     browser.manage().deleteAllCookies(); // logout the hard way
-    loginPage.get();
   });
   
   it('setup ', function() {
@@ -34,47 +34,47 @@ describe('Username Cases', function() {
   });
   
   it('should login lowercase username with test user in lowercase', function() {    
-    loginPage.login('demo1', 'demo');
+    filesPage.getAsUser('demo1', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login camelcase username with test user in lowercase', function() {    
-    loginPage.login('demo2', 'demo');
+    filesPage.getAsUser('demo2', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login uppercase username with test user in lowercase', function() {    
-    loginPage.login('demo3', 'demo');
+    filesPage.getAsUser('demo3', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with lowercase username in camelcase', function() {    
-    loginPage.login('Demo1', 'demo');
+    filesPage.getAsUser('Demo1', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with camelcase username in camelcase', function() {    
-    loginPage.login('Demo2', 'demo');
+    filesPage.getAsUser('Demo2', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with uppercase username in camelcase', function() {  
-    loginPage.login('Demo3', 'demo');
+    filesPage.getAsUser('Demo3', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with lowercase username in uppercase', function() {    
-    loginPage.login('DEMO1', 'demo');
+    filesPage.getAsUser('DEMO1', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with lowercase username in uppercase', function() {   
-    loginPage.login('DEMO2', 'demo');
+    filesPage.getAsUser('DEMO2', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
   it('should login with lowercase username in uppercase', function() {   
-    loginPage.login('DEMO3', 'demo');
+    filesPage.getAsUser('DEMO3', 'demo');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');
   });
   
@@ -84,10 +84,9 @@ describe('Username Cases', function() {
     userPage.deleteUser('demo1');
     userPage.deleteUser('Demo2');
     userPage.deleteUser('DEMO3');
-    userPage.get();
+    userPage.get(); // delete last user 
     expect(userPage.listUser()).not.toContain('demo1');
     expect(userPage.listUser()).not.toContain('Demo2');
     expect(userPage.listUser()).not.toContain('DEMO3' );
   });
-  
 });

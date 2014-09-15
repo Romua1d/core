@@ -43,7 +43,6 @@ describe('Users', function() {
     userPage.createNewUser('demo', 'demo');
     userPage.get();
     expect(userPage.listUser()).toContain('demo');
-    loginPage.logout();
   });
   
   it('should login with a new user', function() {    
@@ -78,8 +77,7 @@ describe('Users', function() {
     expect(userPage.listUser()).toContain(
       'demo01', 'demo02', 'demo03', 'demo04', 'demo05', 
       'demo06', 'demo07', 'demo08', 'demo09', 'demo10',
-      'demo11', 'demo12', 'demo13', 'demo14', 
-      'demo15'
+      'demo11', 'demo12', 'demo13', 'demo14', 'demo15'
     );
 
     userPage.get();
@@ -95,44 +93,49 @@ describe('Users', function() {
     userPage.deleteUser('demo13');
     userPage.deleteUser('demo14');
     userPage.deleteUser('demo15');
+
+    userPage.get();
+    expect(userPage.listUser()).not.toContain(
+      'demo04', 'demo05', 
+      'demo06', 'demo07', 'demo08', 'demo09', 'demo10',
+      'demo11', 'demo12', 'demo13', 'demo14', 'demo15'
+    );
   }); 
 
   it('should change displayname', function() {
-    userPage.renameDisplayName('demo01', 'Kevin Klever');
-    userPage.renameDisplayName('demo02', 'Gundula Gaus');
-    userPage.renameDisplayName('demo03', 'Petra Pan');
-
-    userPage.get();
+    userPage.renameDisplayName('demo01', 'Cevin Clever');
+    filesPage.getAsUser('demo01', 'password');
     element(Page.displayNameId()).getText().then(function(displayName) {
-      expect(displayName).toEqual('Manfred Mustermann');
-    })
+      expect(displayName).toEqual('Cevin Clever');
+    });
   });
 
   it('should filter users', function() {
-    userPage.get();
     userPage.userFilter.sendKeys('lev');
     browser.sleep(1000);
-    expect(userPage.listUser()).toContain('Kevin Klever');  
+    expect(userPage.listUser()).toContain('Cevin Clever');  
   });
 
   it('should show warning, if create a user that allready exists', function() {
-    userPage.get();
     userPage.createNewUser('demo01', 'password');
     browser.wait(function() {
       return userPage.warningDialog.isPresent();
     });
     expect(userPage.warningDialog.isDisplayed()).toBeTruthy();
-
   });
 
   it('should change password for users as admin', function() {
     userPage.changeUserPass('demo01', 'changedPass');
-    loginPage.logout();
-    loginPage.login('demo01', 'changedPass');
-
-
+    filesPage.getAsUser('demo01', 'changedPass');
     protrac.getCurrentUrl().then(function(url) {
       expect(filesPage.url).toEqual(url);
     });
+  });
+
+  it('clean up', function() {
+    userPage.deleteUser('demo01');
+    userPage.deleteUser('demo02');
+    userPage.deleteUser('demo03');
+    userPage.get(); // nessesary to delete last user
   });
 });
