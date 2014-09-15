@@ -2,7 +2,6 @@
 * ownCloud
 *
 * @author Sebastian Elpelt
-* @copyright 2014 Sebastian Elpelt <sebastian@webhippie.de>
 *
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU AFFERO GENERAL PUBLIC LICENSE
@@ -29,8 +28,10 @@ var ShareApi = require('../pages/share_api.page.js');
 var parseXml = require('xml2js').parseString;
 var flow = protractor.promise.controlFlow();
 
+//================ CREATE  SHARES ======================================================//
+//======================================================================================//
 
-describe('Share', function() {
+describe('Create shares', function() {
   var params = browser.params;
   var loginPage;
   var userPage;
@@ -47,7 +48,7 @@ describe('Share', function() {
     shareApi = new ShareApi(params.baseUrl);
   });
 
-  it('should login as admin and create 4 new users', function() {
+  it('setup', function() {
     userPage.getAsUser(params.login.user, params.login.password);
     // userPage.get();
     // userPage.createNewGroup('test_specGroup_1');
@@ -151,15 +152,70 @@ describe('Share', function() {
     loginPage.logout()
   });
 
-  it('should delete the root folder shared with a user account by another user', function() {
-    filesPage.getAsUser('demo2', 'password');
-    filesPage.deleteFile('toShare_2');
-    browser.sleep(800);
-    expect(filesPage.listFiles()).not.toContain('toShare_2');
-
-    loginPage.logout();
+  it('clean up', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-    expect(filesPage.listFiles()).toContain('toShare_2');
+    filesPage.deleteFolder('sP€c!@L');
+    filesPage.deleteFolder('toShare_1');
+    filesPage.deleteFolder('toShare_2');
+
+    userPage.get();
+    userPage.deleteUser('demo');
+    userPage.deleteUser('demo2');
+    userPage.deleteUser('demo3');
+    userPage.deleteUser('demo4');
+    userPage.get(); // delete last user 
+    expect(userPage.listUser()).not.toContain('demo', 'demo2', 'demo3', 'demo4');
+  });
+});
+
+//================ DELETE SHARED FILES AND FOLDERS =====================================//
+//======================================================================================//
+
+describe('Delete shared files and folders', function() {
+  var params = browser.params;
+  var loginPage;
+  var userPage;
+  var filesPage;
+  var adminPage;
+  var shareApi;
+
+  beforeEach(function() {
+    isAngularSite(false);
+    loginPage = new LoginPage(params.baseUrl);
+    userPage = new UserPage(params.baseUrl);
+    filesPage = new FilesPage(params.baseUrl);
+    adminPage = new AdminPage(params.baseUrl);
+    shareApi = new ShareApi(params.baseUrl);
+  });
+
+  it('setup', function() {
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.createNewUser('demo', 'password');
+    browser.sleep(500);
+    expect(userPage.listUser()).toContain('demo');
+  });
+
+  it('should delete the root folder shared with a user account by another user', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+
+    var createFile = function() {
+      filesPage.createTxtFile('toShare')
+    };
+    var createShare = function() {
+      return shareApi.create('toShare.txt', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+
+    filesPage.getAsUser('demo', 'password');
+    filesPage.deleteFile('toShare.txt');
+    browser.sleep(800);
+    expect(filesPage.listFiles()).not.toContain('toShare');
+
+    filesPage.getAsUser(params.login.user, params.login.password);
+    expect(filesPage.listFiles()).toContain('toShare');
+    filesPage.deleteFile('toShare.txt');
   });
 
   it('should delete a file shared with a user, only form user if user deletes it', function() {
@@ -167,13 +223,11 @@ describe('Share', function() {
     filesPage.createTxtFile('toDeleteByUser');
     filesPage.shareFile('toDeleteByUser.txt', 'demo');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     filesPage.deleteFile('toDeleteByUser.txt');
     browser.sleep(800);
     expect(filesPage.listFiles()).not.toContain('inSharedBySecond');
 
-    loginPage.logout();
     filesPage.getAsUser(params.login.user, params.login.password);
     expect(filesPage.listFiles()).toContain('toDeleteByUser');
     filesPage.deleteFile('toDeleteByUser.txt');
@@ -181,20 +235,30 @@ describe('Share', function() {
 
   it('should delete a file in a shared folder, from all', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-    filesPage.getFolder('toShare_1');
-    filesPage.createTxtFile('toDeleteFromAll');
 
-    loginPage.logout();
+    var createFile = function() {
+      filesPage.createFolder('sharedFolder')    
+      filesPage.getFolder('sharedFolder');
+      filesPage.createTxtFile('toDeleteFromAll');
+    };
+    var createShare = function() {
+      return shareApi.create('sharedFolder', 'demo', 0);
+    };
+
+    flow.execute(createFile);
+    flow.execute(createShare);
+
     filesPage.getAsUser('demo', 'password');
-    filesPage.getFolder('toShare_1');
+    filesPage.getFolder('sharedFolder');
     filesPage.deleteFile('toDeleteFromAll.txt');
     browser.sleep(800);
     expect(filesPage.listFiles()).not.toContain('toDeleteFormAll');
 
-    loginPage.logout();
     filesPage.getAsUser(params.login.user, params.login.password);
-    filesPage.getFolder('toShare_1');
+    filesPage.getFolder('sharedFolder');
     expect(filesPage.listFiles()).not.toContain('toDeleteFromAll');
+    filesPage.get();
+    filesPage.deleteFolder('sharedFolder');
   });
 
   it('should delete a file shared with a user, form all if owner deletes it', function() {
@@ -202,19 +266,49 @@ describe('Share', function() {
     filesPage.createTxtFile('toDeleteByOwner');
     filesPage.shareFile('toDeleteByOwner.txt', 'demo');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     expect(filesPage.listFiles()).toContain('toDeleteByOwner');
 
-    loginPage.logout();
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.deleteFile('toDeleteByOwner.txt');
   
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     expect(filesPage.listFiles()).not.toContain('toDeleteByOwner');
-    loginPage.logout();
+  });
 
+  it('clean up', function() {
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.deleteUser('demo');
+    userPage.get(); // delete last user 
+    expect(userPage.listUser()).not.toContain('demo');
+  });
+});
+
+//================ SHARE OPTIONS =======================================================//
+//======================================================================================//
+
+describe('Share options', function() {
+  var params = browser.params;
+  var loginPage;
+  var userPage;
+  var filesPage;
+  var adminPage;
+  var shareApi;
+
+  beforeEach(function() {
+    isAngularSite(false);
+    loginPage = new LoginPage(params.baseUrl);
+    userPage = new UserPage(params.baseUrl);
+    filesPage = new FilesPage(params.baseUrl);
+    adminPage = new AdminPage(params.baseUrl);
+    shareApi = new ShareApi(params.baseUrl);
+  });
+
+  it('setup', function() {
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.createNewUser('demo', 'password');
+    browser.sleep(500);
+    expect(userPage.listUser()).toContain('demo');
   });
 
   it('should not be possible to reshare a folder, if the "re-share" option is removed', function() {
@@ -230,7 +324,6 @@ describe('Share', function() {
   });
 
   it('should not be possible to modify a file shared without edit privileges', function() {
-    loginPage.logout
     filesPage.getAsUser(params.login.user, params.login.password);
 
     var createFile = function() {
@@ -265,14 +358,13 @@ describe('Share', function() {
     flow.execute(createFile);
     flow.execute(createShare);
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
     filesPage.editTxtFile('userEdits.txt', 'User made edits!');
     
-    loginPage.logout();
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.openFile('userEdits.txt');    
     expect(filesPage.getTextContent()).toEqual('User made edits!')
+    filesPage.get();
     filesPage.deleteFile('userEdits.txt');
   });
 
@@ -290,9 +382,7 @@ describe('Share', function() {
     flow.execute(createShare);
     filesPage.editTxtFile('ownerEdits.txt', 'Owner made edits!');
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
-    
     filesPage.openFile('ownerEdits.txt');    
     expect(filesPage.getTextContent()).toEqual('Owner made edits!')
   });
@@ -327,27 +417,37 @@ describe('Share', function() {
     flow.execute(createFiles);
     flow.execute(createShare);
 
-    loginPage.logout();
     filesPage.getAsUser('demo', 'password');
-
-    filesPage.getFolder('sharedFolder');
-    var sharedFile = element(filesPage.permanentShareButtonId('sharedFile.txt'));
-    var otherSharedFile = element(filesPage.permanentShareButtonId('otherSharedFile.txt'));
-    var folderInSharedFolder = element(filesPage.permanentShareButtonId('folderInSharedFolder'));
-    var otherFolderInSharedFolder = element(filesPage.permanentShareButtonId('otherFolderInSharedFolder'));
-
-    expect(sharedFile.isDisplayed()).toBeTruthy();
-    expect(otherSharedFile.isDisplayed()).toBeTruthy();
-    expect(folderInSharedFolder.isDisplayed()).toBeTruthy();
-    expect(otherFolderInSharedFolder.isDisplayed()).toBeTruthy();
+    filesPage.getFolder('sharedFolder').then(function() {
+      var sharedFile = element(filesPage.permanentShareButtonId('sharedFile.txt'));
+      browser.sleep(800);
+      var otherSharedFile = element(filesPage.permanentShareButtonId('otherSharedFile.txt'));
+      var folderInSharedFolder = element(filesPage.permanentShareButtonId('folderInSharedFolder'));
+      var otherFolderInSharedFolder = element(filesPage.permanentShareButtonId('otherFolderInSharedFolder'));
+      expect(sharedFile.isDisplayed()).toBeTruthy();
+      expect(otherSharedFile.isDisplayed()).toBeTruthy();
+      expect(folderInSharedFolder.isDisplayed()).toBeTruthy();
+      expect(otherFolderInSharedFolder.isDisplayed()).toBeTruthy();
+    })
   });
 
-  it('should rename a shared folder and it keeps being shared', function() {
-    filesPage.getAsUser(params.login.user, params.login.password);
-    filesPage.renameFile('folderInSharedFolder', 'renamedSharedFolder');
+  it('should rename a shared folder and the folder stays shared', function() {
+    filesPage.getAsUser(params.login.user, params.login.password); 
+    var createFolder = function() {
+    filesPage.createFolder('sharedFolder3');
+    };
 
-    var renamedSharedFolder = element(filesPage.permanentShareButtonId('renamedSharedFolder'));
-    expect(renamedSharedFolder.isDisplayed()).toBeTruthy();
+    var createShare = function() {
+      shareApi.create('sharedFolder3', 'demo', 0);
+    };
+
+    flow.execute(createFolder);
+    flow.execute(createShare);
+
+    filesPage.getAsUser('demo', 'password');
+    filesPage.renameFile('sharedFolder3', 'renamedSharedFolder');
+    browser.sleep(500);
+    expect(element(filesPage.permanentShareButtonId('renamedSharedFolder')).isDisplayed()).toBeTruthy();
   });
 
   it('should share a file, if it is moved in a shared folder', function() {
@@ -364,34 +464,14 @@ describe('Share', function() {
     flow.execute(createFolder);
     flow.execute(createShare);
 
-    page.dragAndDrop(filesPage.fileListElemId('moveMeIn.txt'), filesPage.fileListElemId('moveItIn'));
-    filesPage.getFolder('moveItIn');
-    var sharedIcon = element(filesPage.permanentShareButtonId('moveMeIn.txt'));
-    expect(sharedIcon.isDisplayed()).toBeTruthy();
-    filesPage.deleteFile('moveItIn');
-  });
-
-  it('should rename a shared folder and the folder stays shared', function() {
-    filesPage.getAsUser(params.login.user, params.login.password); 
-    var createFolder = function() {
-    filesPage.createFolder('sharedFolder3');
-    };
-
-    var createShare = function() {
-      shareApi.create('sharedFolder3', 'demo', 0);
-    };
-
-    flow.execute(createFolder);
-    flow.execute(createShare);
-    loginPage.logout();
+    Page.dragAndDrop(filesPage.fileListElemId('moveMeIn.txt'), filesPage.fileListElemId('moveItIn'));
     filesPage.getAsUser('demo', 'password');
-    filesPage.renameFile('sharedFolder3', 'renamedSharedFolder');
-    browser.sleep(500);
-    expect(element(filesPage.permanentShareButtonId('renamedSharedFolder')).isDisplayed()).toBeTruthy();
+    filesPage.getFolder('moveItIn');
+    expect(filesPage.listFiles()).toContain('moveMeIn');
   });
 
   it('should have access to a shared subfolder', function() {
-    filesPage.getAsUser(params.login.user, params.login.password); 
+    filesPage.getAsUser(params.login.user, params.login.password);
     var protrac = protractor.getInstance();
     var createFolder = function() {
       filesPage.createFolder('sharedFolder4');
@@ -413,10 +493,27 @@ describe('Share', function() {
     protrac.getCurrentUrl().then(function(url) {
       expect(expectedUrl).toEqual(url);
     });
-  })
+  });
 
+  it('clean up', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    filesPage.deleteFolder('noReshare');
+    filesPage.deleteFolder('sharedFolder');
+    filesPage.deleteFolder('sharedFolder3');
+    filesPage.deleteFolder('sharedFolder4');
+    filesPage.deleteFolder('moveItIn');
+    filesPage.deleteFile('noEdits.txt');
+    filesPage.deleteFile('ownerEdits.txt');
+  
+    userPage.get();
+    userPage.deleteUser('demo');
+    userPage.get(); // delete last user 
+    expect(userPage.listUser()).not.toContain('demo');
+  });
 });
 
+//================ ADMIN CONFIGS SHARE =================================================//
+//======================================================================================//
 
 describe('Admin configs Share', function() {
   var params = browser.params;
@@ -435,13 +532,21 @@ describe('Admin configs Share', function() {
     shareApi = new ShareApi(params.baseUrl);
   });
 
+  it('setup', function() {
+    userPage.getAsUser(params.login.user, params.login.password);
+    userPage.createNewUser('demo', 'password');
+    browser.sleep(500);
+    expect(userPage.listUser()).toContain('demo');
+  });
+
   it('should not be possible to share via link, if admin disabled this option', function() {
     adminPage.getAsUser(params.login.user, params.login.password);
     adminPage.disableOption(adminPage.allowLinksCheckBox);
     filesPage.get();
-    filesPage.openShareForm('ownerEdits.txt');
-    expect(filesPage.shareLinkCheckBox.toBeDisplayed()).toBeFalsy();
-
+    filesPage.createTxtFile('noLinks');
+    filesPage.openShareForm('noLinks.txt');
+    expect(filesPage.shareLinkCheckBox.isPresent()).toBeFalsy();
+    filesPage.deleteFile('noLinks.txt');
     adminPage.get();
     adminPage.activateOption(adminPage.allowLinksCheckBox);
   });
@@ -462,12 +567,14 @@ describe('Admin configs Share', function() {
 
     adminPage.getAsUser(params.login.user, params.login.password);
     adminPage.disableOption(adminPage.allowResharingCheckBox);
-    loginPage.logout();
+
     filesPage.getAsUser('demo', 'password');
     expect(filesPage.checkReshareability('disabledReshare.txt')).toBeFalsy();
-    loginPage.logout();
+    adminPage.getAsUser(params.login.user, params.login.password);
+    adminPage.activateOption(adminPage.allowResharingCheckBox);
   });
 
+  // test fails in owncloud 7
   it('should show "can share" option, when admin disabled reshare option', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
     filesPage.openShareForm('disabledReshare.txt');
@@ -499,11 +606,23 @@ describe('Admin configs Share', function() {
     adminPage.disableOption(adminPage.shareAPIEnabledCheckBox);
 
     filesPage.get();
-    page.moveMouseTo(filesPage.fileListElemId('noSharesAtAll.txt'));
+    Page.moveMouseTo(filesPage.fileListElemId('noSharesAtAll.txt'));
 
     expect(element(filesPage.shareButtonId('noSharesAtAll.txt')).isPresent()).toBeFalsy();
 
     adminPage.get();
     adminPage.activateOption(adminPage.shareAPIEnabledCheckBox);
+  });
+
+  it('clean up', function() {
+    filesPage.getAsUser(params.login.user, params.login.password);
+    filesPage.deleteFile('disabledReshare.txt');
+    filesPage.deleteFile('enforceLinkPass.txt');
+    expect(filesPage.listFiles()).not.toContain('noReshare');
+
+    userPage.get();
+    userPage.deleteUser('demo');
+    userPage.get(); // delete last user 
+    expect(userPage.listUser()).not.toContain('demo');
   });
 });

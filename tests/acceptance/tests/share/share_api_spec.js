@@ -57,7 +57,7 @@ describe('Share Api', function() {
 
     flow.execute(get).then(function(res){
       parseXml(res.body, function (err, result) {
-        console.dir(result.ocs.data);
+        // console.dir(result.ocs.data); // array of all shares
       });
       expect(res.statusCode).toEqual(200);
     });
@@ -70,7 +70,7 @@ describe('Share Api', function() {
 
     flow.execute(create).then(function(res){
       parseXml(res.body, function (err, result) {
-        console.log(result.ocs.data, result.ocs.meta);
+        // console.log(result.ocs.data, result.ocs.meta); // information about created share
         expect(result.ocs.meta[0].statuscode[0]).toEqual('100');
       });
     });

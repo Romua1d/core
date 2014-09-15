@@ -39,12 +39,12 @@
   * @param {String} pass user's password
   */
 
-  AdminPage.prototype.getAsUser = function() {
+  AdminPage.prototype.getAsUser = function(userName, pass) {
     var Page = require('../helper/page.js')
     var submit = this.submitFilesSettings;
     
     // general function
-    Page.getAsUser(name, pass, this.url);
+    Page.getAsUser(userName, pass, this.url);
     
     // wait for adminpage to load
     return browser.wait(function() {

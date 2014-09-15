@@ -8,8 +8,7 @@
  *
  */
 
-/* global protractor, module, element, by, browser */
-
+/* global module, protractor, element, by, browser, require */
 (function() {
   var LoginPage = require('../pages/login.page.js');
   var params = browser.params;
@@ -126,22 +125,52 @@
 //================ PAGE NAVIGATION =====================================================//
 //======================================================================================//
 
+  
+  /**
+  * checks if user is logged in, 
+  * if yes, returns name of user is currently logged in 
+  * if not, returns false,
+  *
+  */
+
   Page.isLoggedIn = function() {
-    return element(this.displayNameId()).isPresent().then(function(isLoggedIn) {
-      return isLoggedIn;
+    displayName = element(this.displayNameId());
+
+    return displayName.isPresent().then(function(isLoggedIn) {
+      if(isLoggedIn) {
+        return displayName.getText().then(function(text){
+          return text
+        });
+      } else {
+        return false
+      }
     });
   }
 
-  Page.getAsUser = function(name, pass, url) { 
+  /**
+  * checks if specific user is logged in, 
+  * if not logs out and logs in with specific user and gets specific page
+  * is used in pages to build specific *page.getAsUser functions 
+  *
+  * @param {String} userName username
+  * @param {String} pass user's password
+  * @param {String} [url] default filespage / page's url to get 
+  */
+
+  Page.getAsUser = function(userName, pass, url) { 
     if(url == undefined) {
       url = params.baseUrl;
     };
 
     return this.isLoggedIn().then(function(isLoggedIn) {
-      if( ! isLoggedIn) {
-        var loginPage = new LoginPage(params.baseUrl);
+      var loginPage = new LoginPage(params.baseUrl);
+
+      if( isLoggedIn !== userName) {
+        if(isLoggedIn !== false) {
+          loginPage.logout(); 
+        };
         return loginPage.get().then(function() {
-          return loginPage.login(name, pass).then(function() {
+          return loginPage.login(userName, pass).then(function() {
             return browser.get(url);
           });
         });
@@ -154,18 +183,34 @@
 //================ MOUSE ACTIONS =======================================================//
 //======================================================================================//
 
+  /**
+  * mouves mouse to a specific page element
+  *
+  * @param {String} locator element's locator mouse is mouved to
+  */
+
   Page.moveMouseTo = function(locator) {
     var elem = element(locator);
     browser.actions().mouseMove(elem).perform();
     return browser.wait(function() {
+      // works just for td elements at the moment
       return element(by.css('td:hover')).isDisplayed();
     });
   };
 
+  /**
+  * drags and drops an page element on an other element 
+  *
+  * @param {String} locator1 element's locator gets draged
+  * @param {String} locator2 element's locator gets droped on
+  */
+
   Page.dragAndDrop = function (locator1, locator2) {
     this.moveMouseTo(locator1);
     browser.actions().mouseDown().perform();
-    this.moveMouseTo(locator2);
+    // can't use mouveMouseTo function cause element the draged element get's droped on don't hover
+    var elem = element(locator2);
+    browser.actions().mouseMove(elem).perform(); 
     browser.actions().mouseUp().perform();
   };
 

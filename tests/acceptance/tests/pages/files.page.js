@@ -29,6 +29,7 @@
     // filelist
     this.selectedFileListId = by.css('tr.searchresult td.filename .innernametext');
     this.firstListElem = element(by.css('#fileList tr:first-child'));
+    this.emptyContent = element(by.id('emptycontent'))
 
     // new Button and dropdownlist elements
     this.newButton = element(by.css('#new a'));
@@ -167,7 +168,7 @@
     folderUrl = this.folderUrl(folderName);
     browser.get(folderUrl);
     var button = this.newButton;
-    browser.wait(function() {
+    return browser.wait(function() {
       return button.isDisplayed();
     }, 5000, 'load files content');
   };
@@ -354,19 +355,12 @@
   */
 
   FilesPage.prototype.disableReshare = function(fileName, userName) {
-    var disableReshareButton = element(this.disableReshareButtonId(fileName));
+    var disableReshareButton = element(this.disableReshareButtonId(userName));
     var dropdown = this.sharedWithDropdown
 
-    // this.openShareForm(fileName);
-
-    // TODO: find correct wait trigger
-    //  browser.wait(function(){
-    //   return dropdown.isDisplayed();
-    // }, 3000);s
-
-    // TODO: Timing Workaround
-    browser.sleep(800);
-    disableReshareButton.click();
+    return this.openShareForm(fileName).then(function() {
+      return disableReshareButton.click();
+    });
   };
 
   /**
@@ -376,10 +370,9 @@
   */
 
   FilesPage.prototype.checkReshareability = function(fileName) {
-    var page = new Page();
     var shareButtonLocator = this.shareButtonId(fileName);
 
-    return page.moveMouseTo(this.fileListElemId(fileName)).then(function() {        
+    return Page.moveMouseTo(this.fileListElemId(fileName)).then(function() {        
       return element(shareButtonLocator).isPresent();
     });
   };
@@ -395,15 +388,9 @@
     var disableEditButton = element(this.disableEditButtonId(userName));
     var dropdown = this.sharedWithDropdown
 
-    this.openShareForm(fileName);
-
-    // TODO: find correct wait trigger
-    //  browser.wait(function(){
-    //   return dropdown.isDisplayed();
-    // }, 3000);s
-    // TODO: Timing Workaround
-    browser.sleep(800);
-    disableEditButton.click();
+    return this.openShareForm(fileName).then(function() {
+      return disableEditButton.click();
+    });
   };
 
 //================ RESTORE =============================================================//
@@ -433,7 +420,7 @@
   */
 
   FilesPage.prototype.restoreFolder = function(id) {
-    this.restoreFile(id);
+    return this.restoreFile(id);
   };
 
 //================ CREATE ==============================================================//
