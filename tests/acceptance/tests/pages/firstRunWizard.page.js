@@ -10,7 +10,7 @@
       console.log(by.id('closeWizard'));
       return by.id('closeWizard');
       // return by.id('firstrunwizard');
-    }, 8000);
+    }, browser.params.wait);
   };
   
   FirstRunWizardPage.prototype.isFirstRunWizardPage = function() {
@@ -23,7 +23,7 @@
       return element(by.id('cboxOverlay')).isDisplayed().then(function(displayed) {
         return !displayed; // Do a little Promise/Boolean dance here, since wait will resolve promises.
       });
-    }, 3000, 'firstrunwizard should dissappear');
+    }, browser.params.wait, 'firstrunwizard should dissappear');
   }
   
   FirstRunWizardPage.prototype.close = function() {

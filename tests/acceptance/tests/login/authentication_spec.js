@@ -8,6 +8,8 @@
  *
  */
 
+// Assumes FirstRunWizard to be disabled
+
 var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var FirstRunWizardPage = require('../pages/firstRunWizard.page.js');
@@ -56,7 +58,6 @@ describe('Authentication', function() {
   });
   
   it('should login admin user', function() {  
-    // Assumes FirstRunWizard to be disabled
     loginPage.login(params.login.user, params.login.password);
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');      
   });

@@ -16,6 +16,7 @@ exports.config = {
   // Use on Commmandline:
   // protractor ... --params.login.user=abc --params.login.password=123
   params: {
+    wait: 15000,
     baseUrl: "http://127.0.0.1/",
     login: {
       user: 'admin',
@@ -48,6 +49,7 @@ exports.config = {
     global.isAngularSite = function(flag){
       browser.ignoreSynchronization = !flag;
     };
+
     browser.driver.manage().window().setSize(1000, 800);
     browser.driver.manage().window().maximize();
     

@@ -77,7 +77,7 @@
     
     return browser.wait(function() {
       return filter.isDisplayed();
-    }, 5000, 'load files content');
+    }, browser.params.wait, 'load files content');
   };
 
   /**

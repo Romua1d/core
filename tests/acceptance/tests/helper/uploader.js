@@ -18,7 +18,7 @@
 
   Uploader.prototype.upload = function(pathToFile) {
     var filesPage = new FilesPage();
-    var fileToUpload = 'upload_foler/' + pathToFile; // path to file you want to upload
+    var fileToUpload = 'upload_folder/' + pathToFile; // path to file you want to upload
     var absolutePath = path.resolve(__dirname, fileToUpload);
 
     console.log(absolutePath);

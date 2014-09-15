@@ -75,7 +75,7 @@
     var button = this.newButton;
     return browser.wait(function() {
       return button.isPresent();
-    }, 5000, 'load files content');
+    }, browser.params.wait, 'login wait expired - try to raise timeout with params.wait ');
   };
       
   /**

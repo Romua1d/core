@@ -15,7 +15,7 @@ var PersonalPage = require('../pages/personal.page.js');
 describe('Change Password  - Valid Usernames', function() {
   var params = browser.params;
   var loginPage;
-  var long_pass = 'newNEW123!"§$%&()=?öüß';
+  var long_pass = 'newNEW""123!"§$%&"()=?öüß';
   var special_pass = 'special%&@/1234!-+=';
   
   beforeEach(function() {
@@ -26,10 +26,8 @@ describe('Change Password  - Valid Usernames', function() {
   });
   
   it('should login as admin and create a test users ', function() {
-    loginPage.fillUserCredentilas(params.login.user, params.login.password);
-    loginPage.loginButton.click();
     userPage = new UserPage(params.baseUrl);
-    userPage.get();
+    userPage.getAsUser(params.login.user, params.login.password);
     userPage.createNewUser('demo', 'password');
     userPage.get();
     expect(userPage.listUser()).toContain('demo');
