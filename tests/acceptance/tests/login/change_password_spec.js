@@ -12,7 +12,7 @@ var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var PersonalPage = require('../pages/personal.page.js');
 
-describe('Change Password  - Valid Usernames', function() {
+ddescribe('Change Password  - Valid Usernames', function() {
   var params = browser.params;
   var loginPage;
   var long_pass = 'newNEW""123!"§$%&"()=?öüß';

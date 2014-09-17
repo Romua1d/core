@@ -396,6 +396,15 @@
 //================ RESTORE =============================================================//
 //======================================================================================//
 
+  FilesPage.prototype.openTrashbin = function() {
+    this.trashbinButton.click();
+    var restoreButton = element(this.restoreButtonId(0))
+    browser.wait(function() {
+      return restoreButton.isPresent()
+    }, 3000);
+    browser.sleep(500);
+  };
+
   /**
   * restores a file
   *
@@ -409,8 +418,11 @@
       id = 0;
     }
 
-    Page.moveMouseTo(this.restoreListElemId(id));
-    return element(this.restoreButtonId(id)).click();
+    var restoreButton = element(this.restoreButtonId(id))
+
+    return Page.moveMouseTo(this.restoreListElemId(id)).then(function() {
+      return restoreButton.click();
+    });
   };
 
   /**

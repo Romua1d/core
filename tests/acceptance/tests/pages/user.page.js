@@ -107,9 +107,10 @@
   */
 
   UserPage.prototype.fillNewUserInput = function(userName, pass) {
-    this.newUserNameInput.sendKeys(userName);
-    browser.sleep(100);
-    return this.newUserPasswordInput.sendKeys(pass);
+    var userPassInput = this.newUserPasswordInput;
+    return this.newUserNameInput.sendKeys(userName).then(function() {
+      return userPassInput.sendKeys(pass);
+    });
   };
     
   /**

@@ -486,7 +486,7 @@ describe('Share options', function() {
 //================ ADMIN CONFIGS SHARE =================================================//
 //======================================================================================//
 
-ddescribe('Admin configs Share', function() {
+describe('Admin configs Share', function() {
   var params = browser.params;
   var userPage
   var filesPage;

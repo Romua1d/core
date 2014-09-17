@@ -11,7 +11,7 @@
 var UserPage = require('../pages/user.page.js');
 var FilesPage = require('../pages/files.page.js');
 
-ddescribe('Username Cases', function() {
+describe('Username Cases', function() {
   var params = browser.params;
   var userPage;
   var filesPage;
@@ -20,7 +20,6 @@ ddescribe('Username Cases', function() {
     isAngularSite(false);
     userPage = new UserPage(params.baseUrl);
     filesPage = new FilesPage(params.baseUrl);
-    browser.manage().deleteAllCookies(); // logout the hard way
   });
   
   it('setup ', function() {

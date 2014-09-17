@@ -17,7 +17,7 @@ var flow = protractor.promise.controlFlow();
 // ============================ RESTORE FOLDERS ====================================================== //
 // =================================================================================================== //
 
-describe('Restore Folders', function() {
+ddescribe('Restore Folders', function() {
   var params = browser.params;
   var filesPage;
   
@@ -31,29 +31,19 @@ describe('Restore Folders', function() {
   it('should restore a emtpy folder that has been deleted', function() {
     filesPage.createFolder('Empty');
     filesPage.deleteFolder('Empty');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return filesPage.listFiles();
-    }, 5000);  
+    filesPage.openTrashbin();
     filesPage.restoreFolder(0);
     filesPage.get();
-  
-
     expect(filesPage.listFiles()).toContain('Empty');
     filesPage.deleteFolder('Empty');
   });
-
+  
   it('should restore a folder including special characters', function() {
     filesPage.createFolder('Sp€c!@l FölD€r');
     filesPage.deleteFolder('Sp€c!@l FölD€r');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
-
+    filesPage.openTrashbin();
     filesPage.restoreFolder(0);
     filesPage.get();
-
     expect(filesPage.listFiles()).toContain('Sp€c!@l FölD€r');
     filesPage.deleteFolder('Sp€c!@l FölD€r');
   });
@@ -64,25 +54,19 @@ it('should restore a non empty folder that has been deleted', function() {
     filesPage.createTxtFile('TextFile');
     filesPage.get();
     filesPage.deleteFolder('nonEmpty');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFolder(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('nonEmpty');
   });
 
-  it('should restore a folder whose name is currently in use', function() {
+  it('should restore a folder with a name, that is currently in use', function() {
     
     // create and delete non empty folder
     filesPage.createFolder('sameFolderName');
     filesPage.deleteFolder('sameFolderName');
     filesPage.createFolder('sameFolderName');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFolder(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('sameFolderName (Wiederhergestellt)'); //for german ownclouds
@@ -97,10 +81,7 @@ it('should restore a non empty folder that has been deleted', function() {
     filesPage.deleteFolder('Subfolder');
     filesPage.get()
     filesPage.deleteFolder('nonEmpty');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFolder(1);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('Subfolder');
@@ -112,7 +93,7 @@ it('should restore a non empty folder that has been deleted', function() {
 // ============================ RESTORE FILES ======================================================== //
 // =================================================================================================== //
 
-describe('Restore Files', function() {
+ddescribe('Restore Files', function() {
   var params = browser.params;
   var filesPage;
   var shareApi;
@@ -127,10 +108,7 @@ describe('Restore Files', function() {
   it('should restore a file thas has been deleted', function() {
     filesPage.createTxtFile('restoreMe');
     filesPage.deleteFile('restoreMe.txt');
-    filesPage.trashbinButton.click();
-        browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFile(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('restoreMe');
@@ -140,10 +118,7 @@ describe('Restore Files', function() {
   it('should restore a file including special characters', function() {
     filesPage.createTxtFile('Sp€c!@L RésTör€');
     filesPage.deleteFile('Sp€c!@L RésTör€.txt');
-    filesPage.trashbinButton.click();
-        browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFile(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('Sp€c!@L RésTör€');
@@ -154,10 +129,7 @@ describe('Restore Files', function() {
     filesPage.createTxtFile('sameFileName');
     filesPage.deleteFile('sameFileName.txt');
     filesPage.createTxtFile('sameFileName');
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFile(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('sameFileName (Wiederhergestellt)'); //for german ownclouds
@@ -179,10 +151,7 @@ describe('Restore Files', function() {
 
     filesPage.deleteFile('restoredShared.txt');
     browser.sleep(800);
-    filesPage.trashbinButton.click();
-    browser.wait(function() {
-      return(filesPage.listFiles());
-    }, 3000);
+    filesPage.openTrashbin();
     filesPage.restoreFile(0);
     filesPage.get();
     expect(filesPage.listFiles()).toContain('restoredShared');
