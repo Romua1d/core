@@ -62,7 +62,7 @@ exports.config = {
     require('jasmine-spec-reporter');
     // add jasmine spec reporter
     var spec_reporter = new jasmine.SpecReporter({
-      displayStacktrace: false,     // display stacktrace for each failed assertion
+      displayStacktrace: true,     // display stacktrace for each failed assertion
       displayFailuresSummary: false, // display summary of all failures after execution
       displaySuccessfulSpec: true,  // display each successful spec
       displayFailedSpec: true,      // display each failed spec
