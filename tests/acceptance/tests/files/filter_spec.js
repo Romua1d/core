@@ -18,7 +18,7 @@ var flow = protractor.promise.controlFlow();
 //================ FILTERS =============================================================//
 //======================================================================================//
 
-ddescribe('Filter', function() {
+describe('Filter', function() {
   var params = browser.params;
   var logninPage;
   var filesPage;
