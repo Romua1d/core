@@ -88,9 +88,14 @@ describe('Create shares', function() {
 
   it('clean up', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-    filesPage.deleteFolder('sP€c!@L');
-    filesPage.deleteFolder('toShare_1');
-    filesPage.deleteFolder('toShare_2');
+    filesPage.deleteFolder('sP€c!@L').then(function(){
+      filesPage.deleteFolder('toShare_1').then(function(){
+        filesPage.deleteFolder('toShare_2');  
+      });      
+    });
+
+    filesPage.get();
+    expect(filesPage.listFiles()).not.toContain('toShare_2');
 
     userPage.get();
     userPage.deleteUser('demo');

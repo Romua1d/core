@@ -50,8 +50,14 @@ describe('Sort', function() {
   });
 
   it('clean up', function() {
-    filesPage.deleteFolder('0A_start');
-    filesPage.deleteFile('ZZ_end.txt');
-    filesPage.deleteFile('newText.txt');
+    filesPage.deleteFolder('0A_start').then(function(){
+      filesPage.deleteFile('ZZ_end.txt').then(function(){
+        filesPage.deleteFile('newText.txt');  
+      });      
+    });
+    
+    filesPage.get();
+    expect(filesPage.listFiles()).not.toContain('newText');
+    
   });
 });

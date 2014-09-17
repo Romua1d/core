@@ -125,11 +125,14 @@ describe('Admin configs Share', function() {
 
   it('clean up', function() {
     filesPage.getAsUser(params.login.user, params.login.password);
-    filesPage.deleteFile('disabledReshare.txt');
-    filesPage.deleteFile('enforceLinkPass.txt');
-    filesPage.deleteFile('noSharesAtAll.txt');
+    filesPage.deleteFile('disabledReshare.txt').then(function(){
+      filesPage.deleteFile('enforceLinkPass.txt').then(function(){
+        filesPage.deleteFile('noSharesAtAll.txt');      
+      });      
+    });
+
     filesPage.get();
-    expect(filesPage.listFiles()).not.toContain('noReshare');
+    expect(filesPage.listFiles()).not.toContain('noSharesAtAll');
 
     userPage.get();
     userPage.deleteUser('demo');
