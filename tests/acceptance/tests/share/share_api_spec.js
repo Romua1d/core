@@ -16,7 +16,7 @@ var parseXml = require('xml2js').parseString;
 
 var flow = protractor.promise.controlFlow();
 
-describe('Share Api', function() {
+ddescribe('Share Api', function() {
   var params = browser.params;
   var shareApi;
   var userPage;
@@ -54,12 +54,12 @@ describe('Share Api', function() {
 
   it('should create a new share', function() {
     var create = function () {
-      return shareApi.create('music', 'demo2', 0);
+      return shareApi.create('testFolder', 'demo2', 0);
     };
 
     flow.execute(create).then(function(res){
       parseXml(res.body, function (err, result) {
-        // console.log(result.ocs.data, result.ocs.meta); // information about created share
+        console.log(result.ocs.data, result.ocs.meta); // information about created share
         expect(result.ocs.meta[0].statuscode[0]).toEqual('100');
       });
     });

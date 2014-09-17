@@ -25,7 +25,6 @@ exports.config = {
   },
 
   suites: {
-    install: 'tests/install/**/*_spec.js',
     basic: [
       'tests/login/**/*_spec.js',
       'tests/users/**/*_spec.js',
@@ -35,6 +34,13 @@ exports.config = {
     community: [
       'tests/apps/**/*_spec.js',
     ],
+    nightly: [
+      'tests/login/**/*_spec.js',
+      'tests/users/**/*_spec.js',
+      'tests/files/**/*_spec.js',
+      'tests/share/**/*_spec.js',
+    ],
+    install: 'tests/install/**/*_spec.js',
     login:  'tests/login/**/*_spec.js',
     apps:  'tests/apps/**/*_spec.js',
     files: 'tests/files/**/*_spec.js',

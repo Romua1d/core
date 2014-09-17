@@ -127,7 +127,7 @@ describe('Create shares', function() {
 //================ CRUD RIGHTS IN SHARED FOLDERS =======================================//
 //======================================================================================//
 
-ddescribe('CRUD rights in shared folders', function() {
+describe('CRUD rights in shared folders', function() {
   var params = browser.params;
   var userPage;
   var filesPage;
