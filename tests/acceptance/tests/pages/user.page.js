@@ -76,7 +76,7 @@
     Page.getAsUser(userName, pass, this.url);
     
     return browser.wait(function() {
-      return filter.isDisplayed();
+      return filter.isPresent();
     }, browser.params.wait, 'load files content');
   };
 
@@ -193,6 +193,13 @@
   */
 
   UserPage.prototype.listUser = function() {
+    // Scroll down one time. TODO: as long as needed to load the users needed
+    var loadingFilter = browser.findElement(by.css('.loading'));
+    var scrollIntoView = function () {
+      arguments[0].scrollIntoView();
+    }
+    browser.executeScript(scrollIntoView, loadingFilter);
+
     return element.all(by.css('td.displayName')).map(function(user) {
       return user.getText();
     });

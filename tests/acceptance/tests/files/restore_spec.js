@@ -17,7 +17,7 @@ var flow = protractor.promise.controlFlow();
 // ============================ RESTORE FOLDERS ====================================================== //
 // =================================================================================================== //
 
-ddescribe('Restore Folders', function() {
+describe('Restore Folders', function() {
   var params = browser.params;
   var filesPage;
   
@@ -93,7 +93,7 @@ it('should restore a non empty folder that has been deleted', function() {
 // ============================ RESTORE FILES ======================================================== //
 // =================================================================================================== //
 
-ddescribe('Restore Files', function() {
+describe('Restore Files', function() {
   var params = browser.params;
   var filesPage;
   var shareApi;

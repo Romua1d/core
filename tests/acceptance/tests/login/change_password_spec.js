@@ -12,7 +12,7 @@ var LoginPage = require('../pages/login.page.js');
 var UserPage = require('../pages/user.page.js');
 var PersonalPage = require('../pages/personal.page.js');
 
-ddescribe('Change Password  - Valid Usernames', function() {
+describe('Change Password  - Valid Usernames', function() {
   var params = browser.params;
   var loginPage;
   var long_pass = 'newNEW""123!"§$%&"()=?öüß';
@@ -85,17 +85,15 @@ ddescribe('Change Password  - Valid Usernames', function() {
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');      
   });
   
-  it('should login as admin and change password for test users ', function() {
+  it('should login with password changed by admin', function() {
     loginPage.login(params.login.user, params.login.password);
     userPage = new UserPage(params.baseUrl);
     userPage.get();
     element(by.css('#userlist tr[data-displayname="demo"] td.password')).click().then(function() {
       element(by.css('#userlist tr[data-displayname="demo"] td.password input')).sendKeys("password");
       element(by.css('#userlist tr[data-displayname="demo"] td.password input')).sendKeys(protractor.Key.ENTER);
-    });
-  });
-  
-  it('should login with password changed by admin', function() {    
+    });  
+    loginPage.logout();
     loginPage.login('demo', 'password');
     expect(browser.getCurrentUrl()).toContain('index.php/apps/files/');      
   });

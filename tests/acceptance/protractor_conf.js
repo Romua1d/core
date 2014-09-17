@@ -32,6 +32,9 @@ exports.config = {
       'tests/files/**/*_spec.js',
       'tests/share/**/*_spec.js',
     ],
+    community: [
+      'tests/apps/**/*_spec.js',
+    ],
     login:  'tests/login/**/*_spec.js',
     apps:  'tests/apps/**/*_spec.js',
     files: 'tests/files/**/*_spec.js',
