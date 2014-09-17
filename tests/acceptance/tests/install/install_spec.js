@@ -11,7 +11,7 @@
 var InstallPage = require('../pages/install.page.js');
 var Screenshot = require('../helper/screenshot.js');
 
-xdescribe('Installation', function() {
+describe('Installation', function() {
   var params = browser.params;
   var installPage;
   
