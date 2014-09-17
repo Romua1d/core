@@ -33,7 +33,7 @@ ddescribe('Filter', function() {
     shareApi = new ShareApi(params.baseUrl);
   });
 
-  iit('setup', function() {
+  it('setup', function() {
     userPage.getAsUser(params.login.user, params.login.password, userPage.url);
     userPage.createNewUser('demo', 'password');
 
@@ -80,7 +80,11 @@ ddescribe('Filter', function() {
     expect(filesPage.listFiles()).toContain('sharedFolder', 'sharedFile', 'sharedFile2');
   });
 
-  iit('clean up', function() {
+  it('clean up', function() {
+    userPage.getAsUser(params.login.user, params.login.password)
+    userPage.deleteUser('demo');
+    expect(userPage.listUser()).not.toContain('demo');
+    
     filesPage.getAsUser(params.login.user, params.login.password).then(function() {
       filesPage.deleteFile('sharedFile.txt').then(function(){
         filesPage.deleteFile('sharedFile2.txt').then(function(){
